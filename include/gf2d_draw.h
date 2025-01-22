@@ -8,6 +8,7 @@
 #include "gfc_color.h"
 
 
+
 /**
  * @brief draw the shape with the color specified
  * @param shape the shape to draw
