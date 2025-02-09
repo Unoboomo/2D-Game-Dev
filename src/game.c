@@ -22,6 +22,7 @@ int main(int argc, char * argv[])
     GFC_Color mouseGFC_Color = gfc_color8(216,2,0,255);
     
     Entity* player;
+    Entity* bug;
 
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -44,6 +45,7 @@ int main(int argc, char * argv[])
     sprite = gf2d_sprite_load_image("images/backgrounds/CHEESE.jpg");
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new(gfc_vector2d(20, 20));
+    bug = bug_new(gfc_vector2d(200, 200));
 
     slog("press [escape] to quit");
 

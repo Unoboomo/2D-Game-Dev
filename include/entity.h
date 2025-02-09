@@ -24,6 +24,20 @@ typedef struct Entity_s
 
 
 /**
+* @brief configure an entity based on provided filename that contains a config
+* @param self the entity to config
+* @param filename the filename of the json providing entity information
+*/
+void entity_configure_from_file(Entity* self, const char* filename);
+
+/**
+* @brief configure an entity based on provided json config
+* @param self the entity to config
+* @param json the json providing entity information
+*/
+void entity_configure(Entity* self, SJson* json);
+
+/**
 * @brief initialize the entity manager
 * @param max upper limit for how many entities can exist at once
 */
@@ -39,6 +53,12 @@ void entity_system_free_all();
 * @brief Draw all entities in the manager
 */
 void entity_system_draw_all();
+
+/**
+* @brief Draw all entities in a list
+* @param entities a GFC_List of entity pointers
+*/
+void entity_system_draw_list();
 
 /**
 * @brief Run all entity think functions

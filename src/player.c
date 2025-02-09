@@ -16,15 +16,8 @@ Entity* player_new(GFC_Vector2D position) {
 		slog("failed to spawn a new player entity");
 		return NULL; 
 	}
-	self->sprite = gf2d_sprite_load_all(
-		"images/ed210.png",
-		128,
-		128,
-		16,
-		0);
+	entity_configure_from_file(self, "def/player.def");
 	self->frame = 0;
-
-	gfc_rect_set(self->hitbox, 25, 34, 81, 55);
 
 	gfc_vector2d_copy(self->position, position);
 

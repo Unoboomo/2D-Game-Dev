@@ -1,0 +1,7 @@
+{
+  "name": "bug_class",
+  "bounds": [ 27, 37, 91, 63 ],
+  "sprite": "images/space_bug.png",
+  "sprite_size": [ 128, 128 ],
+  "sprite_fpl": 16
+}

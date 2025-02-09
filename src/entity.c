@@ -1,5 +1,7 @@
 #include "simple_logger.h"
 
+#include "gfc_config.h"
+
 #include "gf2d_graphics.h"
 
 #include "entity.h"
@@ -29,6 +31,47 @@ void entity_system_close()
 
 }
 
+void entity_configure_from_file(Entity* self, const char* filename) {
+	SJson* json;
+	if (!self) {
+		return;
+	}
+	json = sj_load(filename);
+	if (!json) {
+		slog("json file does not exist");
+		return;
+	}
+	entity_configure(self, json);
+	sj_free(json);
+}
+
+void entity_configure(Entity* self, SJson* json)
+{
+	GFC_Vector4D bounds = { 0 };
+	GFC_Vector2D frame_size = { 0 };
+	Uint32 frames_per_line = 0;
+	const char* sprite = NULL;
+	if ((!self) || (!json)) {
+		return;
+	}
+	sprite = sj_object_get_string(json, "sprite");
+	if (sprite) {
+		sj_object_get_vector2d(json, "sprite_size", &frame_size);
+		sj_object_get_uint32(json, "sprite_fpl", &frames_per_line);
+		self->sprite = gf2d_sprite_load_all(
+			sprite,
+			(Uint32)frame_size.x,
+			(Uint32)frame_size.y,
+			frames_per_line,
+			0);
+	}
+	sj_object_get_string(json, "name");
+	if (sprite) {
+		gfc_line_cpy(self->name, sprite);
+	}
+	sj_object_get_vector4d(json, "bounds", &bounds);
+	self->hitbox = gfc_rect_from_vector4(bounds);
+}
 void entity_system_init(Uint32 max)
 {
 	if (entity_system.entity_list) {
