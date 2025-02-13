@@ -19,24 +19,25 @@ Entity* bug_new(GFC_Vector2D position) {
 	entity_configure_from_file(self, "def/bug.def");
 	self->frame = 0;
 
-	gfc_vector2d_copy(self->position, position);
+	self->physics = physics_obj_new();
+	physics_obj_configure(self->physics);
+	gfc_vector2d_copy(self->physics->position, position);
 
 	self->think = bug_think;
 	self->update = bug_update;
-
+	
 	return self;
 }
 
 void bug_think(Entity* self) {
-	int idle_dir;
+	float idle_dir = 0;
 	if (!self) {
 		return;
 	}
 	//entity idle movement, make function later?
 	if (self->frame == 0) {
-		idle_dir = (int)(gfc_random() * 8);
-		self->velocity = gfc_vector2d_from_angle((GFC_HALF_PI * idle_dir) / 2.0);
-		gfc_vector2d_normalize(&self->velocity); //normalize velocity vector to fix faster diagonal movement
+		idle_dir = (gfc_random() - 0.5) / 10;
+		self->physics->acceleration.x = idle_dir;
 	}
 }
 

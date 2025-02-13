@@ -19,10 +19,13 @@ Entity* player_new(GFC_Vector2D position) {
 	entity_configure_from_file(self, "def/player.def");
 	self->frame = 0;
 
-	gfc_vector2d_copy(self->position, position);
-
+	self->physics = physics_obj_new();
+	physics_obj_configure(self->physics);
+	gfc_vector2d_copy(self->physics->position, position);
+	
 	self->think = player_think;
 	self->update = player_update;
+	
 
 	return self;
 }
@@ -31,15 +34,29 @@ void player_think(Entity* self) {
 	if (!self) {
 		return;
 	}
-	if (gfc_input_command_down("right")) {
-		self->velocity.x = 1.0;
-	}
-	else if (gfc_input_command_down("left")) {
-		self->velocity.x = -1.0;
+	if (gfc_input_command_down("dash")) {
+		self->physics->running = 1;
 	}
 	else {
-		self->velocity.x = 0;
+		self->physics->running = 0;
 	}
+
+	if (gfc_input_command_down("right")) {
+		self->physics->acceleration.x = 0.04 * (1 + self->physics->running);
+		if (self->physics->velocity.x < 0) { //skid stops (quick change in direction from one way to the other
+			self->physics->acceleration.x += 0.08;
+		}
+	}
+	else if (gfc_input_command_down("left")) {
+		self->physics->acceleration.x = -0.04 * (1 + self->physics->running);
+		if (self->physics->velocity.x > 0) { //skid stops (quick change in direction from one way to the other
+			self->physics->acceleration.x += -0.08;
+		}
+	}
+	else {
+		self->physics->acceleration.x = self->physics->velocity.x * -0.04;//-0.04 is the coefficient of friction of the surface the player is on
+	}
+	/*
 	if (gfc_input_command_down("up")) {
 		self->velocity.y = -1.0;
 	}
@@ -49,11 +66,12 @@ void player_think(Entity* self) {
 	else {
 		self->velocity.y = 0;
 	}
-	gfc_vector2d_normalize(&self->velocity); //normalize velocity vector to fix faster diagonal movement
-
-	if (gfc_input_command_down("dash")) {
-		gfc_vector2d_scale(self->velocity, self->velocity, 10);
+	*/
+	if (gfc_input_command_pressed("jump")) {
+		self->physics->velocity.y = -7;
 	}
+
+
 }
 
 void player_update(Entity* self) {

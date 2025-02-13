@@ -12,6 +12,8 @@ typedef struct
 	Entity* entity_list;
 }EntitySystem;
 
+extern Uint8 _DRAWBOUNDS;
+
 static EntitySystem entity_system = { 0 };
 
 /**
@@ -23,55 +25,14 @@ void entity_draw(Entity* self);
 void entity_system_close()
 {
 	entity_system_free_all();
-	if (!entity_system.entity_list) {
+	if (entity_system.entity_list) {
 		free(entity_system.entity_list);
+		entity_system.entity_list = NULL;
 	}
 	memset(&entity_system, 0, sizeof(EntitySystem));
 	slog("entity system closed");
-
 }
 
-void entity_configure_from_file(Entity* self, const char* filename) {
-	SJson* json;
-	if (!self) {
-		return;
-	}
-	json = sj_load(filename);
-	if (!json) {
-		slog("json file does not exist");
-		return;
-	}
-	entity_configure(self, json);
-	sj_free(json);
-}
-
-void entity_configure(Entity* self, SJson* json)
-{
-	GFC_Vector4D bounds = { 0 };
-	GFC_Vector2D frame_size = { 0 };
-	Uint32 frames_per_line = 0;
-	const char* sprite = NULL;
-	if ((!self) || (!json)) {
-		return;
-	}
-	sprite = sj_object_get_string(json, "sprite");
-	if (sprite) {
-		sj_object_get_vector2d(json, "sprite_size", &frame_size);
-		sj_object_get_uint32(json, "sprite_fpl", &frames_per_line);
-		self->sprite = gf2d_sprite_load_all(
-			sprite,
-			(Uint32)frame_size.x,
-			(Uint32)frame_size.y,
-			frames_per_line,
-			0);
-	}
-	sj_object_get_string(json, "name");
-	if (sprite) {
-		gfc_line_cpy(self->name, sprite);
-	}
-	sj_object_get_vector4d(json, "bounds", &bounds);
-	self->hitbox = gfc_rect_from_vector4(bounds);
-}
 void entity_system_init(Uint32 max)
 {
 	if (entity_system.entity_list) {
@@ -159,11 +120,15 @@ void entity_free(Entity* self) {
 	if (self->sprite) {
 		gf2d_sprite_free(self->sprite);
 	}
+	if (self->physics) {
+		physics_obj_free(self->physics);
+	}
 	//anything else for our entity would be freed here
 	memset(self, 0, sizeof(Entity));
 }
 
 void entity_draw(Entity* self) {
+	GFC_Rect rect;
 	if (!self) {
 		return;
 	}
@@ -172,13 +137,61 @@ void entity_draw(Entity* self) {
 	}
 	gf2d_sprite_draw(
 		self->sprite,
-		self->position,
+		self->physics->position,
 		NULL,
 		NULL,
 		NULL,
 		NULL,
 		NULL,
 		(Uint32)self->frame);
+	if (_DRAWBOUNDS) {
+		gfc_rect_copy(rect, self->hitbox);
+		gfc_vector2d_add(rect, rect, self->physics->position);
+		gf2d_draw_rect(rect, GFC_COLOR_YELLOW);
+	}
+}
+
+void entity_configure_from_file(Entity* self, const char* filename) {
+	SJson* json;
+	if (!self) {
+		return;
+	}
+	json = sj_load(filename);
+	if (!json) {
+		slog("json file does not exist");
+		return;
+	}
+	entity_configure(self, json);
+	sj_free(json);
+}
+
+void entity_configure(Entity* self, SJson* json)
+{
+	GFC_Vector4D bounds = { 0 };
+	GFC_Vector2D frame_size = { 0 };
+	Uint32 frames_per_line = 0;
+	const char* sprite = NULL;
+	if ((!self) || (!json)) {
+		return;
+	}
+	sprite = sj_object_get_string(json, "sprite");
+	if (sprite) {
+		sj_object_get_vector2d(json, "sprite_size", &frame_size);
+		sj_object_get_uint32(json, "sprite_fpl", &frames_per_line);
+		self->sprite = gf2d_sprite_load_all(
+			sprite,
+			(Uint32)frame_size.x,
+			(Uint32)frame_size.y,
+			frames_per_line,
+			0);
+	}
+	sj_object_get_string(json, "name");
+	if (sprite) {
+		gfc_line_cpy(self->name, sprite);
+	}
+	sj_object_get_vector4d(json, "bounds", &bounds);
+	self->hitbox = gfc_rect_from_vector4(bounds);
+	//physics_configure
 }
 
 void entity_update_position(Entity* self) {
@@ -187,20 +200,20 @@ void entity_update_position(Entity* self) {
 		return;
 	}
 
-	gfc_vector2d_add(self->position, self->position, self->velocity);
+	physics_update(self->physics);
 
 	screen = gf2d_graphics_get_resolution();
 	//checks for colisions with the edge of the window and prevents leaving the window
-	if (self->position.x + self->hitbox.x < 0) {
-		self->position.x = 0 - self->hitbox.x;
+	if (self->physics->position.x + self->hitbox.x < 0) {
+		self->physics->position.x = 0 - self->hitbox.x;
 	}
-	if (self->position.x + self->hitbox.x + self->hitbox.w > screen.x) {
-		self->position.x = screen.x - self->hitbox.x - self->hitbox.w;
+	if (self->physics->position.x + self->hitbox.x + self->hitbox.w > screen.x) {
+		self->physics->position.x = screen.x - self->hitbox.x - self->hitbox.w;
 	}
-	if (self->position.y + self->hitbox.y < 0) {
-		self->position.y = 0 - self->hitbox.y;
+	if (self->physics->position.y + self->hitbox.y < 0) {
+		self->physics->position.y = 0 - self->hitbox.y;
 	}
-	if (self->position.y + self->hitbox.y + self->hitbox.h > screen.y) {
-		self->position.y = screen.y - self->hitbox.y - self->hitbox.h;
+	if (self->physics->position.y + self->hitbox.y + self->hitbox.h > screen.y) {
+		self->physics->position.y = screen.y - self->hitbox.y - self->hitbox.h;
 	}
 }

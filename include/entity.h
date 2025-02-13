@@ -7,6 +7,8 @@
 
 #include "gf2d_sprite.h"
 
+#include "physics.h"
+
 typedef struct Entity_s
 {
 	Uint8			_inuse;			//memory management flag
@@ -14,28 +16,13 @@ typedef struct Entity_s
 	Sprite			*sprite;		//graphical representation of the entity
 	float			frame;			//for drawing the sprite
 	GFC_Rect		hitbox;			//the bounds for collision of an entity
-	GFC_Vector2D	position;		//the position of the entity in space
-	GFC_Vector2D	velocity;		//how fast the entity is moving 
-	GFC_Vector2D	acceleration;	//how fast the velocity changes
-	float			rotation;
+
+	Physics_Object	*physics;		//a struct holding all the physics variables for the entity
+
 	void			(*think)(struct Entity_s* self);	//pointer to a think function
 	void			(*update)(struct Entity_s* self);	//pointer to a update function (all entities can think based on the same gamestate, then update all)
 }Entity;
 
-
-/**
-* @brief configure an entity based on provided filename that contains a config
-* @param self the entity to config
-* @param filename the filename of the json providing entity information
-*/
-void entity_configure_from_file(Entity* self, const char* filename);
-
-/**
-* @brief configure an entity based on provided json config
-* @param self the entity to config
-* @param json the json providing entity information
-*/
-void entity_configure(Entity* self, SJson* json);
 
 /**
 * @brief initialize the entity manager
@@ -71,7 +58,8 @@ void entity_system_think_all();
 void entity_system_update_all();
 
 /**
-* @breif creates a new entity
+* @breif allocates a new empty entity
+* @reurn NULL on error, or a blank entity
 */
 Entity* entity_new();
 
@@ -80,6 +68,20 @@ Entity* entity_new();
 * @param *self a pointer to the entity to free
 */
 void entity_free(Entity* self);
+
+/**
+* @brief configure an entity based on provided filename that contains a config
+* @param self the entity to config
+* @param filename the filename of the json providing entity information
+*/
+void entity_configure_from_file(Entity* self, const char* filename);
+
+/**
+* @brief configure an entity based on provided json config
+* @param self the entity to config
+* @param json the json providing entity information
+*/
+void entity_configure(Entity* self, SJson* json);
 
 /**
 * @brief updates the position of an entity from its velocity and ensures it is still in the window
