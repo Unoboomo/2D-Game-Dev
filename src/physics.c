@@ -27,7 +27,7 @@ void physics_obj_configure(Physics_Object* self) { // will eventually be configu
 	if (!self) {
 		return;
 	}
-	self->horizontal_velocity_cap = 3;
+	self->horizontal_velocity_cap = 2;
 	self->downward_velocity_cap = 5;
 }
 

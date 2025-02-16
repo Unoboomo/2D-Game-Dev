@@ -6,6 +6,7 @@
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
 
+#include "bug.h"
 #include "entity.h"
 #include "player.h"
 #include "world.h"
