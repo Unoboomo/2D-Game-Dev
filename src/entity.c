@@ -203,6 +203,7 @@ void entity_configure(Entity* self, SJson* json)
 	physics_obj_configure(self->physics, json);
 }
 
+
 void entity_update_position(Entity* self) {
 	GFC_Vector2D screen;
 	if (!self || !self->physics) {
