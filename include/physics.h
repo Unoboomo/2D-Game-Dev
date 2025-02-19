@@ -1,20 +1,27 @@
 #ifndef __PHYSICS_H__
 #define __PHYSICS_H__
 
+#include "gfc_vector.h"
 #include "gfc_config.h"
+#include "gfc_shape.h"
 
-#define FGRAV ((GFC_Vector2D) {0, 0.15})
+#define FGRAV ((GFC_Vector2D) {0, 0.2})
 
 typedef struct Physics_Object_s
 {
 	//Physics!!! YAY!
-	GFC_Vector2D	position;				//the position of the entity in space
+	GFC_Vector2D	position;				//the position of the entity in space (the entity is centered on this point)
 	GFC_Vector2D	velocity;				//how fast the entity is moving
 	float			horizontal_velocity_cap;//the max speed an entity can move horizontally
 	Uint8			running;				//if 1, doubles the foreward velocity cap
 	float			downward_velocity_cap;	//the max speed an entity can move vertically
 	GFC_Vector2D	acceleration;			//how fast the velocity changes 
 	int				dir_face;				//what direction the entity is facing, right is 1, left is -1
+
+	GFC_Vector2D	center;					//the center of the entity's bounding box
+	GFC_Rect		bounds;					//the bounds for collision of an entity
+
+
 
 	/* Physics stuff ripped from quake 2
 	float				speed, accel, decel;
@@ -41,7 +48,6 @@ Physics_Object* physics_obj_new();
 */
 void physics_obj_free(Physics_Object* self);
 
-
 /**
 * @brief configure an physics object based on provided filename that contains a config
 * @param self the physics object to config
@@ -54,15 +60,12 @@ void physics_obj_configure_from_file(Physics_Object* self, const char* filename)
 * @param self the physics object to config
 * @param json the json providing physics object information
 */
-void physics_obj_configure(Physics_Object* self);
-
+void physics_obj_configure(Physics_Object* self, SJson* json);
 
 /**
-* @brief calculate a change in position based on position and velocity
+* @brief calculates changes in position and velocity
 * @param self the physics object to update
 * @return NULL on error, or a pointer to the spawned player entity
 */
 void physics_update(Physics_Object* self);
-
-
 #endif

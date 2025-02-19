@@ -16,11 +16,14 @@ Entity* player_new(GFC_Vector2D position) {
 		slog("failed to spawn a new player entity");
 		return NULL; 
 	}
+	self->physics = physics_obj_new();
+	if (!self->physics) {
+		slog("failed to create a physics object for new player entity");
+		return NULL;
+	}
 	entity_configure_from_file(self, "def/player.def");
 	self->frame = 0;
 
-	self->physics = physics_obj_new();
-	physics_obj_configure(self->physics);
 	gfc_vector2d_copy(self->physics->position, position);
 	
 	self->think = player_think;
@@ -34,6 +37,7 @@ void player_think(Entity* self) {
 	if (!self) {
 		return;
 	}
+
 	if (gfc_input_command_down("dash")) {
 		self->physics->running = 1;
 	}
@@ -43,18 +47,18 @@ void player_think(Entity* self) {
 
 	if (gfc_input_command_down("right")) {
 		self->physics->acceleration.x = 0.04 * (1 + self->physics->running);
-		if (self->physics->velocity.x < 0) { //skid stops (quick change in direction from one way to the other
+		if (self->physics->velocity.x < 0) { //skid stops (quick change in direction from one way to the other)
 			self->physics->acceleration.x += 0.08;
 		}
 	}
 	else if (gfc_input_command_down("left")) {
 		self->physics->acceleration.x = -0.04 * (1 + self->physics->running);
-		if (self->physics->velocity.x > 0) { //skid stops (quick change in direction from one way to the other
+		if (self->physics->velocity.x > 0) { //skid stops (quick change in direction from one way to the other)
 			self->physics->acceleration.x += -0.08;
 		}
 	}
 	else {
-		self->physics->acceleration.x = self->physics->velocity.x * -0.04;//-0.04 is the coefficient of friction of the surface the player is on
+		self->physics->acceleration.x = self->physics->velocity.x * -0.04; //-0.04 is the coefficient of friction of the surface the player is on i think
 	}
 	/*
 	if (gfc_input_command_down("up")) {
@@ -68,7 +72,7 @@ void player_think(Entity* self) {
 	}
 	*/
 	if (gfc_input_command_pressed("jump")) {
-		self->physics->velocity.y = -7;
+		self->physics->velocity.y = -8;
 	}
 
 

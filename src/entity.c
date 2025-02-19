@@ -2,6 +2,7 @@
 
 #include "gfc_config.h"
 
+#include "gf2d_draw.h"
 #include "gf2d_graphics.h"
 
 #include "entity.h"
@@ -12,7 +13,7 @@ typedef struct
 	Entity* entity_list;
 }EntitySystem;
 
-extern Uint8 _DRAWBOUNDS;
+extern Uint8 _DRAWBOUNDS; //get external variable, this one is in game.c
 
 static EntitySystem entity_system = { 0 };
 
@@ -127,27 +128,36 @@ void entity_free(Entity* self) {
 	memset(self, 0, sizeof(Entity));
 }
 
+
+
 void entity_draw(Entity* self) {
 	GFC_Rect rect;
-	if (!self) {
+	GFC_Rect center;
+	GFC_Vector2D draw_pos = { 0 };
+	if ((!self) || (!self->sprite) || (!self->physics)) {
 		return;
 	}
-	if (!self->sprite) {
-		return;
-	}
+
+	gfc_vector2d_sub(draw_pos, self->physics->position, self->physics->center); //draw position is different that the position because the entity is centered on the position
+
 	gf2d_sprite_draw(
 		self->sprite,
-		self->physics->position,
+		draw_pos,
 		NULL,
 		NULL,
 		NULL,
 		NULL,
 		NULL,
 		(Uint32)self->frame);
+
 	if (_DRAWBOUNDS) {
-		gfc_rect_copy(rect, self->hitbox);
+		gfc_rect_copy(rect, self->physics->bounds);
 		gfc_vector2d_add(rect, rect, self->physics->position);
+		gfc_vector2d_sub(rect, rect, self->physics->center);
 		gf2d_draw_rect(rect, GFC_COLOR_YELLOW);
+
+		center = gfc_rect(self->physics->position.x - 2, self->physics->position.y - 2, 5, 5);
+		gf2d_draw_rect_filled(center, GFC_COLOR_YELLOW);
 	}
 }
 
@@ -167,13 +177,13 @@ void entity_configure_from_file(Entity* self, const char* filename) {
 
 void entity_configure(Entity* self, SJson* json)
 {
-	GFC_Vector4D bounds = { 0 };
 	GFC_Vector2D frame_size = { 0 };
 	Uint32 frames_per_line = 0;
 	const char* sprite = NULL;
 	if ((!self) || (!json)) {
 		return;
 	}
+
 	sprite = sj_object_get_string(json, "sprite");
 	if (sprite) {
 		sj_object_get_vector2d(json, "sprite_size", &frame_size);
@@ -185,35 +195,35 @@ void entity_configure(Entity* self, SJson* json)
 			frames_per_line,
 			0);
 	}
-	sj_object_get_string(json, "name");
+	sprite = sj_object_get_string(json, "name");
 	if (sprite) {
 		gfc_line_cpy(self->name, sprite);
 	}
-	sj_object_get_vector4d(json, "bounds", &bounds);
-	self->hitbox = gfc_rect_from_vector4(bounds);
-	//physics_configure
+
+	physics_obj_configure(self->physics, json);
 }
 
 void entity_update_position(Entity* self) {
 	GFC_Vector2D screen;
-	if (!self) {
+	if (!self || !self->physics) {
 		return;
 	}
 
 	physics_update(self->physics);
 
 	screen = gf2d_graphics_get_resolution();
+
 	//checks for colisions with the edge of the window and prevents leaving the window
-	if (self->physics->position.x + self->hitbox.x < 0) {
-		self->physics->position.x = 0 - self->hitbox.x;
+	if (self->physics->position.x - self->physics->bounds.w / 2 < 0) {
+		self->physics->position.x = self->physics->bounds.w / 2;
 	}
-	if (self->physics->position.x + self->hitbox.x + self->hitbox.w > screen.x) {
-		self->physics->position.x = screen.x - self->hitbox.x - self->hitbox.w;
+	if (self->physics->position.x + self->physics->bounds.w / 2 > screen.x) {
+		self->physics->position.x = screen.x - self->physics->bounds.w / 2;
 	}
-	if (self->physics->position.y + self->hitbox.y < 0) {
-		self->physics->position.y = 0 - self->hitbox.y;
+	if (self->physics->position.y - self->physics->bounds.h / 2 < 0) {
+		self->physics->position.y = self->physics->bounds.h / 2;
 	}
-	if (self->physics->position.y + self->hitbox.y + self->hitbox.h > screen.y) {
-		self->physics->position.y = screen.y - self->hitbox.y - self->hitbox.h;
+	if (self->physics->position.y + self->physics->bounds.h / 2 > screen.y) {
+		self->physics->position.y = screen.y - self->physics->bounds.h / 2;
 	}
 }

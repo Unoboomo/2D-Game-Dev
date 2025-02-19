@@ -15,7 +15,6 @@ typedef struct Entity_s
 	GFC_TextLine	name;			//name of the entity for debugging
 	Sprite			*sprite;		//graphical representation of the entity
 	float			frame;			//for drawing the sprite
-	GFC_Rect		hitbox;			//the bounds for collision of an entity
 
 	Physics_Object	*physics;		//a struct holding all the physics variables for the entity
 
@@ -40,6 +39,7 @@ void entity_system_free_all();
 * @brief Draw all entities in the manager
 */
 void entity_system_draw_all();
+
 
 /**
 * @brief Draw all entities in a list
