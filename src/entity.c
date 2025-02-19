@@ -132,7 +132,7 @@ void entity_free(Entity* self) {
 
 void entity_draw(Entity* self) {
 	GFC_Rect rect;
-	GFC_Rect center;
+	GFC_Rect center_pos;
 	GFC_Vector2D draw_pos = { 0 };
 	if ((!self) || (!self->sprite) || (!self->physics)) {
 		return;
@@ -156,8 +156,8 @@ void entity_draw(Entity* self) {
 		gfc_vector2d_sub(rect, rect, self->physics->center);
 		gf2d_draw_rect(rect, GFC_COLOR_YELLOW);
 
-		center = gfc_rect(self->physics->position.x - 2, self->physics->position.y - 2, 5, 5);
-		gf2d_draw_rect_filled(center, GFC_COLOR_YELLOW);
+		center_pos = gfc_rect(self->physics->position.x - 2, self->physics->position.y - 2, 5, 5); 
+		gf2d_draw_rect_filled(center_pos, GFC_COLOR_YELLOW);
 	}
 }
 

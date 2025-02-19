@@ -38,10 +38,10 @@ void physics_obj_configure(Physics_Object* self, SJson* json) {
 
 	//add to json file eventually?
 	self->horizontal_velocity_cap = 2;
-	self->downward_velocity_cap = 8;
+	self->downward_velocity_cap = 8; //should be the same (ish) as initial jump velocity
 }
 
-void physics_update(Physics_Object* self) {
+void physics_update(Physics_Object* self) { //check if collision happens after addition but before changing the variables, if there is, handle that and cancel movement?
 
 	/**		RELAVENT PHYSICS EQUATIONS
 	*		v_now = v_last + a + g

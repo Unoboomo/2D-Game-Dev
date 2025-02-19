@@ -9,12 +9,15 @@
 
 #include "physics.h"
 
+//create team struct
+
 typedef struct Entity_s
 {
 	Uint8			_inuse;			//memory management flag
 	GFC_TextLine	name;			//name of the entity for debugging
 	Sprite			*sprite;		//graphical representation of the entity
 	float			frame;			//for drawing the sprite
+	Uint8			team;			//which entities can collide with other entities. If same team, cannot collide
 
 	Physics_Object	*physics;		//a struct holding all the physics variables for the entity
 
