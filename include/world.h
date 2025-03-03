@@ -2,12 +2,14 @@
 #define __WORLD_H__
 
 #include "gf2d_sprite.h"
+#include "gf2d_graphics.h"
 
 typedef struct
 {
 	Sprite* background;	//background image for the world
+	Sprite* tile_layer;	//prerendered tile layer
 	Sprite* tileset;	//sprite containing tiles for the world
-	Uint8* tile_map;		//the tiles that make up the world
+	Uint8* tile_map;	//the tiles that make up the world
 	Uint32 tile_height;	//how many tiles tall the map is
 	Uint32 tile_width;	//how many tiles wide the map is
 }World;

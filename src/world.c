@@ -2,6 +2,67 @@
 
 #include "world.h"
 
+void world_tile_layer_build(World* world) {
+	GFC_Vector2D position;
+	Uint32 frame;
+	int i, j;
+	Uint32 index;
+
+	if (!world) {
+		return;
+	}
+
+	if (!world->tileset) {
+		slog("cannot draw a world with no tileset");
+		return;
+	}
+
+	if (world->tile_layer) {
+		gf2d_sprite_free(world->tile_layer);
+	}
+	world->tile_layer = gf2d_sprite_new();
+
+	world->tile_layer->frame_w = world->tile_width * world->tileset->frame_w;
+	world->tile_layer->frame_h = world->tile_height * world->tileset->frame_h;
+
+	world->tile_layer->surface = gf2d_graphics_create_surface(
+		world->tile_layer->frame_w,
+		world->tile_layer->frame_h);
+
+	if (!world->tile_layer->surface) {
+		slog("failed to create tile_layer surface");
+		return;
+	}
+
+	for (i = 0; i < world->tile_height; i++) {
+		for (j = 0; j < world->tile_width; j++) {
+
+			index = j + (i * world->tile_width);
+			if (world->tile_map[index] == 0) {
+				continue;
+			}
+			position.x = j * world->tileset->frame_w;
+			position.y = i * world->tileset->frame_h;
+			frame = world->tile_map[index] - 1;
+
+			gf2d_sprite_draw_to_surface(
+				world->tileset,
+				position,
+				NULL,
+				NULL,
+				frame,
+				world->tile_layer->surface);
+		}
+	}
+
+	world->tile_layer->texture = SDL_CreateTextureFromSurface(gf2d_graphics_get_renderer(), world->tile_layer->surface);
+
+	if (!world->tile_layer->texture)
+	{
+		slog("failed to convert world tile layer to texture");
+		return;
+	}
+}
 World* world_test_new() {
 	int i;
 	int width = 75;
@@ -27,6 +88,7 @@ World* world_test_new() {
 		world->tile_map[i * width] = 1;
 		world->tile_map[i * width + width - 1] = 1;
 	}
+	world_tile_layer_build(world);
 	return world;
 }
 
@@ -55,41 +117,17 @@ void world_free(World* world) {
 	}
 	gf2d_sprite_free(world->background);
 	gf2d_sprite_free(world->tileset);
+	gf2d_sprite_free(world->tile_layer);
 	free(world->tile_map);
+	free(world);
 }
 
 void world_draw(World* world) {
-	int i, j;
-	int frame;
-	int index;
-	GFC_Vector2D position;
 	if (!world) {
 		slog("cannot draw a world that doesn't exist");
 		return;
 	}
-	if (!world->tileset) {
-		slog("cannot draw a world with no tileset");
-		return;
-	}
+
 	gf2d_sprite_draw_image(world->background, gfc_vector2d(0, 0));
-	for (i = 0; i < world->tile_height; i++) {
-		for (j = 0; j < world->tile_width; j++) {
-			index = j + (i * world->tile_width);
-			if (world->tile_map[index] == 0) {
-				continue;
-			}
-			position.x = j * world->tileset->frame_w;
-			position.y = i * world->tileset->frame_h;
-			frame = world->tile_map[index] - 1;
-			gf2d_sprite_draw(
-				world->tileset,
-				position,
-				NULL,
-				NULL,
-				NULL,
-				NULL,
-				NULL,
-				frame);
-		}
-	}
+	gf2d_sprite_draw_image(world->tile_layer, gfc_vector2d(0, 0));
 }
