@@ -39,4 +39,11 @@ void world_free(World* world);
 * @param *self a pointer to the world to draw
 */
 void world_draw(World* world);
+
+/**
+* @brief draws the tiles of the world to a surface, to reduce draw calls
+* @param *self a pointer to the world to draw
+*/
+void world_tile_layer_build(World* world);
+
 #endif

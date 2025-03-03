@@ -22,12 +22,19 @@ void world_tile_layer_build(World* world) {
 	}
 	world->tile_layer = gf2d_sprite_new();
 
+	if (!world->tile_layer) {
+		slog("Failed to create new tile_layer sprite");
+		return;
+	}
+
 	world->tile_layer->frame_w = world->tile_width * world->tileset->frame_w;
 	world->tile_layer->frame_h = world->tile_height * world->tileset->frame_h;
 
 	world->tile_layer->surface = gf2d_graphics_create_surface(
 		world->tile_layer->frame_w,
 		world->tile_layer->frame_h);
+	
+	SDL_FillRect(world->tile_layer->surface,NULL, SDL_MapRGBA(world->tile_layer->surface->format,0,0,0,0));
 
 	if (!world->tile_layer->surface) {
 		slog("failed to create tile_layer surface");
@@ -73,6 +80,7 @@ World* world_test_new() {
 	if (!world) {
 		return NULL;
 	}
+
 	world->background = gf2d_sprite_load_image("images/backgrounds/CHEESE.jpg");
 	world->tileset = gf2d_sprite_load_all(
 		"images/backgrounds/tileset.png",
@@ -88,6 +96,7 @@ World* world_test_new() {
 		world->tile_map[i * width] = 1;
 		world->tile_map[i * width + width - 1] = 1;
 	}
+
 	world_tile_layer_build(world);
 	return world;
 }
@@ -126,6 +135,12 @@ void world_draw(World* world) {
 	if (!world) {
 		slog("cannot draw a world that doesn't exist");
 		return;
+	}
+	if (!world->background) {
+		slog("cannot draw a world with no background");
+	}
+	if (!world->tile_layer) {
+		slog("cannot draw a world with no tile_layer");
 	}
 
 	gf2d_sprite_draw_image(world->background, gfc_vector2d(0, 0));
