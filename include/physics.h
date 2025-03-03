@@ -20,6 +20,7 @@ typedef struct Physics_Object_s
 
 	GFC_Vector2D	center;					//the center of the entity's bounding box
 	GFC_Rect		bounds;					//the bounds for collision of an entity
+	//GFC_Rect		bounds_position;		//the position in space of the bounds of an entity
 
 
 
@@ -63,9 +64,24 @@ void physics_obj_configure_from_file(Physics_Object* self, const char* filename)
 void physics_obj_configure(Physics_Object* self, SJson* json);
 
 /**
+* @brief calculates the position of a physics objects bounds in space
+* @param self the physics object to get bounds position of
+* @return a GFC_Rect containing the bounds position
+*/
+GFC_Rect physics_obj_get_world_bounds_position(Physics_Object* self);
+
+/**
 * @brief calculates changes in position and velocity
 * @param self the physics object to update
 * @return NULL on error, or a pointer to the spawned player entity
 */
 void physics_update(Physics_Object* self);
+
+/**
+* @brief checks to see if two physics objects are colliding
+* @param self the first physics object being checked
+* @param other the other physics object being checked
+* @return 1 if the objects are colliding, 0 if not
+*/
+Uint8 physics_obj_collision_check(Physics_Object* self, Physics_Object* other);
 #endif

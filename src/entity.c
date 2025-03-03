@@ -203,13 +203,17 @@ void entity_configure(Entity* self, SJson* json)
 	physics_obj_configure(self->physics, json);
 }
 
-
 void entity_update_position(Entity* self) {
 	GFC_Vector2D screen;
+	GFC_List* entity_collisions;
 	if (!self || !self->physics) {
 		return;
 	}
-
+	entity_collisions = entity_collide_all(self);
+	if (entity_collisions) {
+		slog("colliding %s", self->name);
+	}
+	gfc_list_delete(entity_collisions);
 	physics_update(self->physics);
 
 	screen = gf2d_graphics_get_resolution();
@@ -227,4 +231,29 @@ void entity_update_position(Entity* self) {
 	if (self->physics->position.y + self->physics->bounds.h / 2 > screen.y) {
 		self->physics->position.y = screen.y - self->physics->bounds.h / 2;
 	}
+}
+
+
+GFC_List* entity_collide_all(Entity* self) {
+	int i;
+	GFC_List* entities = gfc_list_new();
+	if (!self) {
+		return NULL;
+	}
+	for (i = 0; i < entity_system.entity_max; i++) {
+		if (!entity_system.entity_list[i]._inuse) {
+			continue;
+		}
+		if (self == &entity_system.entity_list[i]) {
+			continue;
+		}
+		if (physics_obj_collision_check(self->physics, entity_system.entity_list[i].physics)) { 
+			gfc_list_append(entities, &entity_system.entity_list[i]);
+		}
+	}
+	if (!gfc_list_count(entities)) {
+		gfc_list_delete(entities);
+		return NULL;
+	}
+	return entities;
 }

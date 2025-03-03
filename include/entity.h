@@ -9,8 +9,6 @@
 
 #include "physics.h"
 
-//create team struct
-
 typedef struct Entity_s
 {
 	Uint8			_inuse;			//memory management flag
@@ -22,6 +20,9 @@ typedef struct Entity_s
 
 	void			(*think)(struct Entity_s* self);	//pointer to a think function
 	void			(*update)(struct Entity_s* self);	//pointer to a update function (all entities can think based on the same gamestate, then update all)
+
+
+	void			*data;			//the storage for unique entity type data, eg. (gclient, monsterdata, itemdata, etc.)			
 }Entity;
 
 
@@ -41,7 +42,6 @@ void entity_system_free_all();
 * @brief Draw all entities in the manager
 */
 void entity_system_draw_all();
-
 
 /**
 * @brief Draw all entities in a list
@@ -91,4 +91,11 @@ void entity_configure(Entity* self, SJson* json);
 */
 void entity_update_position(Entity* self);
 
+/**
+* @brief gets a list of all colliding entities,
+* @param *self a pointer to the entity to check with
+* @return Null if there are no collisions, a list of entity pointers otherwise
+* @note any list returned must be freed with gfc_list_delete()
+*/
+GFC_List* entity_collide_all(Entity* self);
 #endif
