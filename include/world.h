@@ -15,8 +15,15 @@ typedef struct
 }World;
 
 /**
+* @breif loading world from a config file
+* @param filename the name of the world file to load
+* @return NULL on error, a usable world otherwise
+*/
+World* world_load(const char* filename);
+
+/**
 * @breif test to see if world is working
-* @reurn NULL on error, or a blank world
+* @return NULL on error, or a blank world
 */
 World* world_test_new();
 
@@ -24,7 +31,7 @@ World* world_test_new();
 * @breif allocates a new empty world
 * @param width the number of tiles wide the world is
 * @param height the number of tiles high the world is
-* @reurn NULL on error, or a blank world
+* @return NULL on error, or a blank world
 */
 World* world_new(Uint32 width, Uint32 height);
 

@@ -1,4 +1,5 @@
 #include "simple_logger.h"
+#include "simple_json.h"
 
 #include "world.h"
 
@@ -70,10 +71,136 @@ void world_tile_layer_build(World* world) {
 		return;
 	}
 }
+
+World* world_load(const char* filename) {
+	World* world = NULL;
+	SJson* json = NULL;
+	SJson* wjson = NULL;
+	SJson* vertical;
+	SJson* horizontal;
+	SJson* item;
+	int tile;
+	int width = 0;
+	int height = 0;
+	int i, j;
+	const char* background;
+	const char* tileset;
+	int frame_w, frame_h;
+	int frames_per_line;
+
+	if (!filename) {
+		slog("no filename provided for world_load");
+		return NULL;
+	}
+
+	json = sj_load(filename);
+	if (!json) {
+		slog("failed to load world file %s", filename);
+		return NULL;
+	}
+
+	wjson = sj_object_get_value(json, "world");
+	if (!wjson) {
+		slog("%s missing 'world' object",filename);
+		sj_free(json);
+		return NULL;
+	}
+
+	vertical = sj_object_get_value(wjson, "tile_map");
+	if (!vertical) {
+		slog("%s missing 'tile_map'",filename);
+		sj_free(json);
+		return NULL;
+	}
+	height = sj_array_get_count(vertical);
+
+	horizontal = sj_array_get_nth(vertical,0);
+	if (!horizontal) {
+		slog("%s missing 'tile_map' rows",filename);
+		sj_free(json);
+		return NULL;
+	}
+	width = sj_array_get_count(horizontal);
+
+	world = world_new(width,height);
+	if (!world) {
+		slog("failed to create world with file %s",filename);
+		sj_free(json);
+		return NULL;
+	}
+
+
+	for (i = 0; i < height; i++) {
+		horizontal = sj_array_get_nth(vertical, i);
+		if (!horizontal) { // may want to error over this, but for now skip
+			continue;
+		}
+
+		for (j = 0; j < width; j++) {
+			item = sj_array_get_nth(horizontal, j);
+			if (!item) {
+				continue;
+			}
+			tile = 0;
+			sj_get_integer_value(item, &tile);
+			world->tile_map[j + (i * width)] = tile;
+
+		}
+	}
+
+	background = sj_object_get_value_as_string(wjson, "background");
+	if (!background) {
+		slog("%s missing 'tileset'", filename);
+		sj_free(json);
+		return NULL;
+	}
+
+	tileset = sj_object_get_value_as_string(wjson, "tileset");
+	if (!tileset) {
+		slog("%s missing 'tileset'", filename);
+		sj_free(json);
+		return NULL;
+	}
+
+	sj_object_get_value_as_int(wjson, "frame_w", &frame_w);
+	if (!frame_w) {
+		slog("%s missing 'frame_w'", filename);
+		sj_free(json);
+		return NULL;
+	}
+
+	sj_object_get_value_as_int(wjson, "frame_h", &frame_h);
+	if (!frame_h) {
+		slog("%s missing 'frame_h'", filename);
+		sj_free(json);
+		return NULL;
+	}
+
+	sj_object_get_value_as_int(wjson, "frames_per_line", &frames_per_line);
+	if (!frames_per_line) {
+		slog("%s missing 'frames_per_line'", filename);
+		sj_free(json);
+		return NULL;
+	}
+
+	world->background = gf2d_sprite_load_image(background);
+	world->tileset = gf2d_sprite_load_all(
+		tileset,
+		frame_w,
+		frame_h,
+		frames_per_line,
+		1);
+
+	world_tile_layer_build(world);
+
+	sj_free(json);
+
+	return world;
+}
 World* world_test_new() {
 	int i;
-	int width = 75;
-	int height = 45;
+	int width = 21;
+	int height = 12;
 	World* world;
 
 	world = world_new(width, height);
@@ -84,8 +211,8 @@ World* world_test_new() {
 	world->background = gf2d_sprite_load_image("images/backgrounds/CHEESE.jpg");
 	world->tileset = gf2d_sprite_load_all(
 		"images/backgrounds/tileset.png",
-		16,
-		16,
+		60,
+		60,
 		1,
 		1);
 	for (i = 0; i < width; i++) {

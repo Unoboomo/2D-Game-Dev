@@ -36,9 +36,9 @@ int main(int argc, char * argv[])
     slog("---==== BEGIN ====---");
     gf2d_graphics_initialize(
         "gf2d",
-        1200,
+        1260,
         720,
-        1200,
+        1260,
         720,
         gfc_vector4d(0,0,0,255),
         0);
@@ -52,7 +52,7 @@ int main(int argc, char * argv[])
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new(gfc_vector2d(20, 20));
     bug = bug_new(gfc_vector2d(200, 200));
-    world = world_test_new();
+    world = world_load("worlds/testworld.world");
 
     slog("press [escape] to quit");
 
