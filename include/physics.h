@@ -5,7 +5,7 @@
 #include "gfc_config.h"
 #include "gfc_shape.h"
 
-#define FGRAV ((GFC_Vector2D) {0, 0.2})
+#define FGRAV ((GFC_Vector2D) {(float) 0, (float) 0.2})
 
 typedef struct Physics_Object_s
 {

@@ -15,6 +15,12 @@ typedef struct
 }World;
 
 /**
+* @brief draws the tiles of the world to a surface, to reduce draw calls
+* @param *self a pointer to the world to draw
+*/
+void world_tile_layer_build(World* world);
+
+/**
 * @breif loading world from a config file
 * @param filename the name of the world file to load
 * @return NULL on error, a usable world otherwise
@@ -48,9 +54,9 @@ void world_free(World* world);
 void world_draw(World* world);
 
 /**
-* @brief draws the tiles of the world to a surface, to reduce draw calls
-* @param *self a pointer to the world to draw
+* @brief set the camera bounds to the world size
+* @param the world whose bounds we set the camera's to
 */
-void world_tile_layer_build(World* world);
+void world_setup_camera(World* world);
 
 #endif

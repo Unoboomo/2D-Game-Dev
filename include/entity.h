@@ -92,6 +92,12 @@ void entity_configure(Entity* self, SJson* json);
 void entity_update_position(Entity* self);
 
 /**
+* @brief ensures an entity is still in the world/window/camera bounds
+* @param *self a pointer to the entity to check the bounds of
+*/
+void entity_check_world_bounds(Entity* self);
+
+/**
 * @brief gets a list of all colliding entities,
 * @param *self a pointer to the entity to check with
 * @return Null if there are no collisions, a list of entity pointers otherwise

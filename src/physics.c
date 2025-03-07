@@ -42,7 +42,11 @@ void physics_obj_configure(Physics_Object* self, SJson* json) {
 }
 
 GFC_Rect physics_obj_get_world_bounds_position(Physics_Object* self) {
-	GFC_Rect bounds_pos;
+	GFC_Rect bounds_pos = { 0 };
+	if (!self) {
+		slog("cannot get position of a physics object that doesnt exist");
+		return bounds_pos;
+	}
 	gfc_rect_copy(bounds_pos, self->bounds);
 	gfc_vector2d_add(bounds_pos, bounds_pos, self->position);
 	gfc_vector2d_sub(bounds_pos, bounds_pos, self->center);

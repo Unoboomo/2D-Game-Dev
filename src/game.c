@@ -7,6 +7,7 @@
 #include "gf2d_sprite.h"
 
 #include "bug.h"
+#include "camera.h"
 #include "entity.h"
 #include "player.h"
 #include "world.h"
@@ -36,9 +37,9 @@ int main(int argc, char * argv[])
     slog("---==== BEGIN ====---");
     gf2d_graphics_initialize(
         "gf2d",
-        1260,
+        1280,
         720,
-        1260,
+        1280,
         720,
         gfc_vector4d(0,0,0,255),
         0);
@@ -47,12 +48,14 @@ int main(int argc, char * argv[])
     gf2d_sprite_init(1024);
     entity_system_init(128); 
     SDL_ShowCursor(SDL_DISABLE);
+    camera_set_size(gfc_vector2d(1280, 720));
     
     /*demo setup*/
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new(gfc_vector2d(20, 20));
     bug = bug_new(gfc_vector2d(200, 200));
     world = world_load("worlds/testworld.world");
+    world_setup_camera(world);
 
     slog("press [escape] to quit");
 

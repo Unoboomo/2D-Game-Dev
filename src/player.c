@@ -4,6 +4,8 @@
 
 #include "gf2d_graphics.h"
 
+#include "camera.h"
+
 #include "player.h"
 
 void player_think(Entity* self);
@@ -87,4 +89,10 @@ void player_update(Entity* self) {
 		self->frame = 0;
 	}
 	entity_update_position(self);
+
+	if (self->physics) {
+		camera_center_on(self->physics->position);
+	}
+	
+
 }

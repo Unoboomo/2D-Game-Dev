@@ -5,6 +5,8 @@
 #include "gf2d_draw.h"
 #include "gf2d_graphics.h"
 
+#include "camera.h"
+
 #include "entity.h"
 
 typedef struct
@@ -134,12 +136,14 @@ void entity_draw(Entity* self) {
 	GFC_Rect rect;
 	GFC_Rect center_pos;
 	GFC_Vector2D draw_pos = { 0 };
+	GFC_Vector2D camera_offset;
 	if ((!self) || (!self->sprite) || (!self->physics)) {
 		return;
 	}
+	camera_offset = camera_get_offset();
 
 	gfc_vector2d_sub(draw_pos, self->physics->position, self->physics->center); //draw position is different that the position because the entity is centered on the position
-
+	gfc_vector2d_add(draw_pos, draw_pos, camera_offset);
 	gf2d_sprite_draw(
 		self->sprite,
 		draw_pos,
@@ -151,12 +155,13 @@ void entity_draw(Entity* self) {
 		(Uint32)self->frame);
 
 	if (_DRAWBOUNDS) {
-		gfc_rect_copy(rect, self->physics->bounds);
-		gfc_vector2d_add(rect, rect, self->physics->position);
-		gfc_vector2d_sub(rect, rect, self->physics->center);
+		rect = physics_obj_get_world_bounds_position(self->physics);
+		gfc_vector2d_add(rect, rect, camera_offset);
+
 		gf2d_draw_rect(rect, GFC_COLOR_YELLOW);
 
 		center_pos = gfc_rect(self->physics->position.x - 2, self->physics->position.y - 2, 5, 5); 
+		gfc_vector2d_add(center_pos, center_pos, camera_offset);
 		gf2d_draw_rect_filled(center_pos, GFC_COLOR_YELLOW);
 	}
 }
@@ -204,7 +209,6 @@ void entity_configure(Entity* self, SJson* json)
 }
 
 void entity_update_position(Entity* self) {
-	GFC_Vector2D screen;
 	GFC_List* entity_collisions;
 	if (!self || !self->physics) {
 		return;
@@ -216,20 +220,30 @@ void entity_update_position(Entity* self) {
 	gfc_list_delete(entity_collisions);
 	physics_update(self->physics);
 
-	screen = gf2d_graphics_get_resolution();
+	entity_check_world_bounds(self);
+}
 
-	//checks for colisions with the edge of the window and prevents leaving the window
-	if (self->physics->position.x - self->physics->bounds.w / 2 < 0) {
-		self->physics->position.x = self->physics->bounds.w / 2;
+void entity_check_world_bounds(Entity* self) {
+	GFC_Rect bounds;
+
+	if (!self || !self->physics) {
+		return;
 	}
-	if (self->physics->position.x + self->physics->bounds.w / 2 > screen.x) {
-		self->physics->position.x = screen.x - self->physics->bounds.w / 2;
+
+	bounds = camera_get_bounds();
+
+	//checks for colisions with the edge of the world and prevents leaving the world (world bounds = camera bounds)
+	if (self->physics->position.x - self->physics->bounds.w / 2 < bounds.x) {
+		self->physics->position.x = bounds.x + self->physics->bounds.w / 2;
 	}
-	if (self->physics->position.y - self->physics->bounds.h / 2 < 0) {
-		self->physics->position.y = self->physics->bounds.h / 2;
+	if (self->physics->position.x + self->physics->bounds.w / 2 > bounds.x + bounds.w) {
+		self->physics->position.x = bounds.x + bounds.w - self->physics->bounds.w / 2;
 	}
-	if (self->physics->position.y + self->physics->bounds.h / 2 > screen.y) {
-		self->physics->position.y = screen.y - self->physics->bounds.h / 2;
+	if (self->physics->position.y - self->physics->bounds.h / 2 < bounds.y) {
+		self->physics->position.y = bounds.y + self->physics->bounds.h / 2;
+	}
+	if (self->physics->position.y + self->physics->bounds.h / 2 > bounds.y + bounds.h) {
+		self->physics->position.y = bounds.y + bounds.h - self->physics->bounds.h / 2;
 	}
 }
 

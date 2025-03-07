@@ -1,6 +1,8 @@
 #include "simple_logger.h"
 #include "simple_json.h"
 
+#include "camera.h"
+
 #include "world.h"
 
 void world_tile_layer_build(World* world) {
@@ -197,6 +199,7 @@ World* world_load(const char* filename) {
 
 	return world;
 }
+
 World* world_test_new() {
 	int i;
 	int width = 21;
@@ -259,6 +262,7 @@ void world_free(World* world) {
 }
 
 void world_draw(World* world) {
+	GFC_Vector2D offset;
 	if (!world) {
 		slog("cannot draw a world that doesn't exist");
 		return;
@@ -270,6 +274,22 @@ void world_draw(World* world) {
 		slog("cannot draw a world with no tile_layer");
 	}
 
+	offset = camera_get_offset();
+
 	gf2d_sprite_draw_image(world->background, gfc_vector2d(0, 0));
-	gf2d_sprite_draw_image(world->tile_layer, gfc_vector2d(0, 0));
+	gf2d_sprite_draw_image(world->tile_layer, offset);
+}
+
+void world_setup_camera(World* world) {
+	if (!world) {
+		slog("no world to setup camera");
+		return;
+	}
+	if (!world->tile_layer || !world->tile_layer->surface) {
+		slog("no tile layer set for world");
+		return;
+	}
+	camera_set_bounds(gfc_rect(0, 0, world->tile_layer->surface->w, world->tile_layer->surface->h));
+	camera_apply_bounds();
+	camera_enable_binding(1);
 }
