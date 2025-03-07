@@ -55,7 +55,6 @@ int main(int argc, char * argv[])
     player = player_new(gfc_vector2d(20, 20));
     bug = bug_new(gfc_vector2d(200, 200));
     world = world_load("worlds/testworld.world");
-    world_setup_camera(world);
 
     slog("press [escape] to quit");
 

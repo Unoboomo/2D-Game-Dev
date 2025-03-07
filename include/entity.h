@@ -9,20 +9,39 @@
 
 #include "physics.h"
 
+typedef enum {
+	ETT_none,
+	ETT_player,
+	ETT_monster,
+	ETT_item,
+	ETT_MAX
+}EntityTeamType;
+
+typedef enum {
+	ECL_none = 1,
+	ECL_World = 2,
+	ECL_Entity = 4,
+	ECL_Item = 8,
+	ECL_ALL = 15
+}EntityCollisionLayers;
+
 typedef struct Entity_s
 {
-	Uint8			_inuse;			//memory management flag
-	GFC_TextLine	name;			//name of the entity for debugging
-	Sprite			*sprite;		//graphical representation of the entity
-	float			frame;			//for drawing the sprite
+	Uint8					_inuse;								//memory management flag
 
-	Physics_Object	*physics;		//a struct holding all the physics variables for the entity
+	GFC_TextLine			name;								//name of the entity for debugging
+	EntityTeamType			team;								//which team this entity is on
+	EntityCollisionLayers	layer;								//bitmask for layers, only same layer can collide	
 
-	void			(*think)(struct Entity_s* self);	//pointer to a think function
-	void			(*update)(struct Entity_s* self);	//pointer to a update function (all entities can think based on the same gamestate, then update all)
+	Sprite					*sprite;							//graphical representation of the entity
+	float					frame;								//for drawing the sprite
 
+	Physics_Object			*physics;							//a struct holding all the physics variables for the entity
 
-	void			*data;			//the storage for unique entity type data, eg. (gclient, monsterdata, itemdata, etc.)			
+	void					(*think)(struct Entity_s* self);	//pointer to a think function
+	void					(*update)(struct Entity_s* self);	//pointer to a update function (all entities can think based on the same gamestate, then update all)
+
+	void					*data;								//the storage for unique entity type data, eg. (gclient, monsterdata, itemdata, etc.)			
 }Entity;
 
 

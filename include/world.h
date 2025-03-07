@@ -1,8 +1,9 @@
 #ifndef __WORLD_H__
 #define __WORLD_H__
 
-#include "gf2d_sprite.h"
+#include "gf2d_draw.h"
 #include "gf2d_graphics.h"
+#include "gf2d_sprite.h"
 
 typedef struct
 {
@@ -28,6 +29,12 @@ void world_tile_layer_build(World* world);
 World* world_load(const char* filename);
 
 /**
+* @breif returns the active world
+* @return NULL on no active world
+*/
+World* world_get_active();
+
+/**
 * @breif test to see if world is working
 * @return NULL on error, or a blank world
 */
@@ -48,6 +55,14 @@ World* world_new(Uint32 width, Uint32 height);
 void world_free(World* world);
 
 /**
+* @breif gets the value of the tile in a tile map
+* @param world the world whos tilemap to search
+* @param position the position in the tilemap of the tile
+* @return the value of the tile (and 0 on Error)
+*/
+Uint8 world_get_tile_at(World* world, GFC_Vector2D position);
+
+/**
 * @brief draws an world to the screen
 * @param *self a pointer to the world to draw
 */
@@ -58,5 +73,13 @@ void world_draw(World* world);
 * @param the world whose bounds we set the camera's to
 */
 void world_setup_camera(World* world);
+
+/**
+* @brief checks to see a rect collides with the world anywhere
+* @param world the world to check
+* @param bounds the rect being checked
+* @return 1 if the two are colliding, 0 if not
+*/
+Uint8 world_test_collision_rect(World* world, GFC_Rect bounds);
 
 #endif

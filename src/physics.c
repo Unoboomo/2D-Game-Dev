@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 
+#include "world.h"
 
 #include "physics.h"
 
@@ -36,6 +37,7 @@ void physics_obj_configure(Physics_Object* self, SJson* json) {
 
 	self->center = gfc_vector2d(bounds.x + (bounds.z / 2), bounds.y + (bounds.w / 2)); //the center of a rectangle is the point (x+w/2,y+h/2)
 
+	self->grounded = 0;
 	//add to json file eventually?
 	self->horizontal_velocity_cap = 2;
 	self->downward_velocity_cap = 8; //should be the same (ish) as initial jump velocity
@@ -60,24 +62,67 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 	*		x_now = x_last + v_now
 	*/
 
+	GFC_Vector2D test_velocity, test_position;
+	GFC_Rect bounds;
+
 	if (!self) {
 		return;
 	}
 
-	gfc_vector2d_add(self->velocity, self->velocity, self->acceleration); //add player movement acceleration to velocity
-	gfc_vector2d_add(self->velocity, self->velocity, FGRAV); //apply gravity
+	gfc_vector2d_add(test_velocity, self->velocity, self->acceleration); //add player movement acceleration to velocity
 
-	if (self->velocity.x > self->horizontal_velocity_cap * (1 + self->running)) {
-		self->velocity.x = self->horizontal_velocity_cap * (1 + self->running);
+	gfc_vector2d_add(test_velocity, test_velocity, FGRAV); //apply gravity
+
+	if (test_velocity.x > self->horizontal_velocity_cap * (1 + self->running)) {
+		test_velocity.x = self->horizontal_velocity_cap * (1 + self->running);
 	}
-	if (self->velocity.x < -self->horizontal_velocity_cap * (1 + self->running)) {
-		self->velocity.x = -self->horizontal_velocity_cap * (1 + self->running);
+	if (test_velocity.x < -self->horizontal_velocity_cap * (1 + self->running)) {
+		test_velocity.x = -self->horizontal_velocity_cap * (1 + self->running);
 	}
-	if (self->velocity.y > self->downward_velocity_cap) {
-		self->velocity.y = self->downward_velocity_cap;
+	if (test_velocity.y > self->downward_velocity_cap) {
+		test_velocity.y = self->downward_velocity_cap;
 	}
 
-	gfc_vector2d_add(self->position, self->position, self->velocity);
+	gfc_vector2d_add(test_position, self->position, test_velocity);
+
+	bounds = self->bounds;
+	
+	//test move in y direction first, then check if collision
+	gfc_rect_copy(bounds, self->bounds);
+	bounds.y = bounds.y + test_position.y;
+	bounds.x = bounds.x + self->position.x;
+	gfc_vector2d_sub(bounds, bounds, self->center);
+
+	if (!world_test_collision_rect(world_get_active(), bounds)) { //no y direction collision
+		//apply physics in the y direction:
+		self->velocity.y = test_velocity.y;
+		self->position.y = test_position.y;
+		self->grounded = 0;
+	}
+	else { // y direction collision
+		self->velocity.y = 0; //whether we bonked (velocity.y < 0) or are grounded (velocity.y > 0), set velocity.y to 0
+
+		if (test_velocity.y > 0) { //if velocity is positive and a collision happened, we are grounded
+			self->grounded = 1;
+		}
+		else {
+			self->grounded = 0;
+		}
+	}
+
+	bounds.y = self->bounds.y + self->position.y; //if no collision, self->position.y was changed, if not, not changed. either way, we need it for next bounds test
+	bounds.x = self->bounds.x + test_position.x;
+	gfc_vector2d_sub(bounds, bounds, self->center);
+
+
+	if (!world_test_collision_rect(world_get_active(), bounds)) { //no x direction collision
+		self->velocity.x = test_velocity.x;
+		self->position.x = test_position.x;
+	}
+	else { //x direction collision
+		self->velocity.x = 0;
+		self->acceleration.x = 0;
+	}
 }
 
 Uint8 physics_obj_collision_check(Physics_Object* self, Physics_Object* other) { 
@@ -95,25 +140,3 @@ Uint8 physics_obj_collision_check(Physics_Object* self, Physics_Object* other) {
 	//will eventually need to know what side the colission is for killing/dying, but not yet
 	return gfc_rect_overlap(bounds1, bounds2);
 }
-
-/*
-Uint8 entity_check_layer(Entity* self, EntityCollisionLayers layer) {
-	if (!self) {
-		return;
-	}
-	return self->layer & layer;
-}
-
-void entity_set_collision_layer(Entity* self, EntityCollisionLayers layer) {
-	if (!self) {
-		self->layer |= layer;
-	}
-}
-
-void entity_remove_collision_layer(Entity* self, EntityCollisionLayers layer) {
-	if (!self) {
-		return;
-	}
-	self->layer &= ~layer;
-}
-*/

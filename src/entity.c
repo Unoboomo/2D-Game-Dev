@@ -210,18 +210,57 @@ void entity_configure(Entity* self, SJson* json)
 
 void entity_update_position(Entity* self) {
 	GFC_List* entity_collisions;
+	Entity* other;
+	int i,count;
 	if (!self || !self->physics) {
 		return;
 	}
+	
 	entity_collisions = entity_collide_all(self);
+
 	if (entity_collisions) {
-		slog("colliding %s", self->name);
+		count = gfc_list_count(entity_collisions);
+		for (i = 0; i < count; i++) {
+			other = gfc_list_nth(entity_collisions, i);
+			if (!other) {
+				continue;
+			}
+			//handle collisions, probably run other's touch function
+			slog("%s is colliding with %s", self->name, other->name);
+		}
 	}
 	gfc_list_delete(entity_collisions);
+	
 	physics_update(self->physics);
+
+	if (self->physics->grounded && !gfc_line_cmp(self->name,"player_class")) {
+		slog("player is grounded");
+	}
 
 	entity_check_world_bounds(self);
 }
+
+/*
+Uint8 entity_check_layer(Entity* self, EntityCollisionLayers layer) {
+	if (!self) {
+		return;
+	}
+	return self->layer & layer;
+}
+
+void entity_set_collision_layer(Entity* self, EntityCollisionLayers layer) {
+	if (!self) {
+		self->layer |= layer;
+	}
+}
+
+void entity_remove_collision_layer(Entity* self, EntityCollisionLayers layer) {
+	if (!self) {
+		return;
+	}
+	self->layer &= ~layer;
+}
+*/
 
 void entity_check_world_bounds(Entity* self) {
 	GFC_Rect bounds;

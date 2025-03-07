@@ -5,6 +5,10 @@
 
 #include "world.h"
 
+extern Uint8 _DRAWBOUNDS; //get external variable, this one is in game.c
+
+static World* active_world = NULL;
+
 void world_tile_layer_build(World* world) {
 	GFC_Vector2D position;
 	Uint32 frame;
@@ -196,8 +200,14 @@ World* world_load(const char* filename) {
 	world_tile_layer_build(world);
 
 	sj_free(json);
+	active_world = world;
+	world_setup_camera(world);
 
 	return world;
+}
+
+World* world_get_active() {
+	return active_world;
 }
 
 World* world_test_new() {
@@ -261,8 +271,18 @@ void world_free(World* world) {
 	free(world);
 }
 
+Uint8 world_get_tile_at(World* world, GFC_Vector2D position) {
+	if (!world || !world->tile_map) {
+		slog("cannot get a tile in world or tile_map that does not exist");
+		return 0;
+	}
+	return world->tile_map[(Uint32)position.y * (Uint32)world->tile_width + (Uint32)position.x];
+}
+
 void world_draw(World* world) {
 	GFC_Vector2D offset;
+	int i, j;
+	int index;
 	if (!world) {
 		slog("cannot draw a world that doesn't exist");
 		return;
@@ -278,6 +298,27 @@ void world_draw(World* world) {
 
 	gf2d_sprite_draw_image(world->background, gfc_vector2d(0, 0));
 	gf2d_sprite_draw_image(world->tile_layer, offset);
+
+	if (_DRAWBOUNDS) {
+		if (!world->tile_map) {
+			return;
+		}
+		for (i = 0; i < world->tile_height; i++) {
+			for (j = 0; j < world->tile_width; j++) {
+
+				index = j + (i * world->tile_width);
+				if (world->tile_map[index] == 0) {
+					continue;
+				}
+				offset.x = j * world->tileset->frame_w;
+				offset.y = i * world->tileset->frame_h;
+
+				gfc_vector2d_add(offset, offset, camera_get_offset());
+
+				gf2d_draw_rect(gfc_rect(offset.x, offset.y, world->tileset->frame_w, world->tileset->frame_h), GFC_COLOR_YELLOW);
+			}
+		}
+	}
 }
 
 void world_setup_camera(World* world) {
@@ -292,4 +333,34 @@ void world_setup_camera(World* world) {
 	camera_set_bounds(gfc_rect(0, 0, world->tile_layer->surface->w, world->tile_layer->surface->h));
 	camera_apply_bounds();
 	camera_enable_binding(1);
+}
+
+Uint8 world_test_collision_rect(World* world, GFC_Rect bounds) {
+	GFC_Rect tile_rect = { 0 };
+	Uint8 tile_index;
+	int i, j;
+
+	if (!world || !world->tileset) {
+		return 0;
+	}
+
+	tile_rect.w = world->tileset->frame_w;
+	tile_rect.h = world->tileset->frame_h;
+
+	for (i = 0; i < world->tile_height; i++) {
+		for (j = 0; j < world->tile_width; j++) {
+			tile_index = world_get_tile_at(world, gfc_vector2d(j, i));
+
+			if (!tile_index) {
+				continue; //tile is empty/air
+			}
+
+			tile_rect.x = j * tile_rect.w;
+			tile_rect.y = i * tile_rect.h;
+			if (gfc_rect_overlap(tile_rect, bounds)) {
+				return 1;
+			}
+		}
+	}
+	return 0;
 }

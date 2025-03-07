@@ -14,6 +14,7 @@ typedef struct Physics_Object_s
 	GFC_Vector2D	velocity;				//how fast the entity is moving
 	float			horizontal_velocity_cap;//the max speed an entity can move horizontally
 	Uint8			running;				//if 1, doubles the foreward velocity cap
+	Uint8			grounded;				//if the physics object is touching the ground
 	float			downward_velocity_cap;	//the max speed an entity can move vertically
 	GFC_Vector2D	acceleration;			//how fast the velocity changes 
 	int				dir_face;				//what direction the entity is facing, right is 1, left is -1

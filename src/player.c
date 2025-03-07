@@ -64,15 +64,13 @@ void player_think(Entity* self) {
 	}
 	/*
 	if (gfc_input_command_down("up")) {
-		self->velocity.y = -1.0;
+		self->physics->velocity.y = -1.0;
 	}
 	else if (gfc_input_command_down("down")) {
-		self->velocity.y = 1.0;
-	}
-	else {
-		self->velocity.y = 0;
+		self->physics->velocity.y = 1.0;
 	}
 	*/
+	
 	if (gfc_input_command_pressed("jump")) {
 		self->physics->velocity.y = -8;
 	}
