@@ -304,7 +304,6 @@ void entity_collide_all(Entity* self) {
 		if (physics_obj_test_collision_rect(entity_system.entity_list[i].physics, bounds)) {
 
 			if (entity_check_layer(&entity_system.entity_list[i], ECL_World)) { //if this, we treat as a world collision
-				test_position.y = self->physics->position.y;
 				self->physics->velocity.y = 0; //whether we bonked (velocity.y < 0) or are grounded (velocity.y > 0), set velocity.y to 0
 
 				if (velocity_dir.y > 0) { //if velocity is positive and a collision happened, we are grounded
@@ -323,7 +322,9 @@ void entity_collide_all(Entity* self) {
 			if (entity_system.entity_list[i].touch) {
 				entity_system.entity_list[i].touch(&entity_system.entity_list[i], self, collision_side);
 			}
-			
+			if (self->physics->y_collided_prev) {
+				test_position.y = self->physics->position.y;
+			}
 		}
 	}
 
