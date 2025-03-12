@@ -5,18 +5,27 @@
 #include "gfc_config.h"
 #include "gfc_shape.h"
 
-#define FGRAV ((GFC_Vector2D) {(float) 0, (float) 0.2})
+#define FGRAV ((GFC_Vector2D) {(float) 0, (float) 0.7})
+#define JUMPGRAV ((GFC_Vector2D) {(float) 0, (float) 0.2})
 
 typedef struct Physics_Object_s
 {
 	//Physics!!! YAY!
 	GFC_Vector2D	position;				//the position of the entity in space (the entity is centered on this point)
 	GFC_Vector2D	velocity;				//how fast the entity is moving
+	GFC_Vector2D	acceleration;			//how fast the velocity changes 
+
+	GFC_Vector2D	gravity;
+
 	float			horizontal_velocity_cap;//the max speed an entity can move horizontally
+	float			horizontal_deceleration;//the acceleration to slow an entity moving past their horizontal velocity cap by
+
+	float			downward_velocity_cap;	//the max speed an entity can move vertically
+
 	Uint8			running;				//if 1, doubles the foreward velocity cap
 	Uint8			grounded;				//if the physics object is touching the ground
-	float			downward_velocity_cap;	//the max speed an entity can move vertically
-	GFC_Vector2D	acceleration;			//how fast the velocity changes 
+	int				x_world_collision;		//if the physics object colliding with the world on the x axis, positive for right side, negative for left side
+
 	int				dir_face;				//what direction the entity is facing, right is 1, left is -1
 
 	GFC_Vector2D	center;					//the center of the entity's bounding box

@@ -41,6 +41,8 @@ void physics_obj_configure(Physics_Object* self, SJson* json) {
 	//add to json file eventually?
 	self->horizontal_velocity_cap = 2;
 	self->downward_velocity_cap = 8; //should be the same (ish) as initial jump velocity
+	self->horizontal_deceleration = 0.08;
+	self->gravity = FGRAV;
 }
 
 GFC_Rect physics_obj_get_world_bounds_position(Physics_Object* self) {
@@ -70,14 +72,13 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 	}
 
 	gfc_vector2d_add(test_velocity, self->velocity, self->acceleration); //add player movement acceleration to velocity
-
-	gfc_vector2d_add(test_velocity, test_velocity, FGRAV); //apply gravity
+	gfc_vector2d_add(test_velocity, test_velocity, self->gravity); //apply gravity
 
 	if (test_velocity.x > self->horizontal_velocity_cap * (1 + self->running)) {
-		test_velocity.x = self->horizontal_velocity_cap * (1 + self->running);
+		test_velocity.x -= self->horizontal_deceleration;
 	}
 	if (test_velocity.x < -self->horizontal_velocity_cap * (1 + self->running)) {
-		test_velocity.x = -self->horizontal_velocity_cap * (1 + self->running);
+		test_velocity.x += self->horizontal_deceleration;
 	}
 	if (test_velocity.y > self->downward_velocity_cap) {
 		test_velocity.y = self->downward_velocity_cap;
@@ -118,10 +119,19 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 	if (!world_test_collision_rect(world_get_active(), bounds)) { //no x direction collision
 		self->velocity.x = test_velocity.x;
 		self->position.x = test_position.x;
+		self->x_world_collision = 0;
+
 	}
 	else { //x direction collision
 		self->velocity.x = 0;
 		self->acceleration.x = 0;
+
+		if (test_velocity.x > 0) {
+			self->x_world_collision = 1;
+		}
+		else if (test_velocity.x < 0) {
+			self->x_world_collision = -1;
+		}
 	}
 }
 

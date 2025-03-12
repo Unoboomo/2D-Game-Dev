@@ -40,6 +40,7 @@ typedef struct Entity_s
 
 	void					(*think)(struct Entity_s* self);	//pointer to a think function
 	void					(*update)(struct Entity_s* self);	//pointer to a update function (all entities can think based on the same gamestate, then update all)
+	void					(*free)(struct Entity_s* self);		//pointer to a free function
 
 	void					*data;								//the storage for unique entity type data, eg. (gclient, monsterdata, itemdata, etc.)			
 }Entity;

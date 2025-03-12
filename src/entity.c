@@ -126,6 +126,9 @@ void entity_free(Entity* self) {
 	if (self->physics) {
 		physics_obj_free(self->physics);
 	}
+	if (self->free) {
+		self->free(self);
+	}
 	//anything else for our entity would be freed here
 	memset(self, 0, sizeof(Entity));
 }
@@ -232,10 +235,6 @@ void entity_update_position(Entity* self) {
 	gfc_list_delete(entity_collisions);
 	
 	physics_update(self->physics);
-
-	if (self->physics->grounded && !gfc_line_cmp(self->name,"player_class")) {
-		slog("player is grounded");
-	}
 
 	entity_check_world_bounds(self);
 }
