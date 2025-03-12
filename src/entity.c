@@ -317,7 +317,7 @@ void entity_collide_all(Entity* self) {
 			}
 			collision_side = velocity_dir.y > 0 ? gfc_vector2d(0, -1) : gfc_vector2d(0, 1);
 			if (!strcmp(self->name, "player_class")) {
-				slog("%s is colliding with %s", self->name, entity_system.entity_list[i].name);
+				//slog("%s is colliding with %s", self->name, entity_system.entity_list[i].name);
 			}
 			
 			if (entity_system.entity_list[i].touch) {
@@ -357,7 +357,7 @@ void entity_collide_all(Entity* self) {
 			collision_side = velocity_dir.x > 0 ? gfc_vector2d(-1, 0) : gfc_vector2d(1,0);
 
 			if (!strcmp(self->name, "player_class")) {
-				slog("%s is colliding with %s", self->name, entity_system.entity_list[i].name);
+				//slog("%s is colliding with %s", self->name, entity_system.entity_list[i].name);
 			}
 			
 			if (entity_system.entity_list[i].touch) {

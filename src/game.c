@@ -13,6 +13,8 @@
 #include "world.h"
 #include "coin.h"
 #include "brick.h"
+#include "question_block.h"
+#include "platform.h"
 
 Uint8 _DRAWBOUNDS = 0;
 
@@ -34,6 +36,9 @@ int main(int argc, char * argv[])
     Entity* bug;
     Entity* coin;
     Entity* brick;
+    Entity* question_block;
+    Entity* invisible_question_block;
+    Entity* platform;
 
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -61,7 +66,9 @@ int main(int argc, char * argv[])
     coin = coin_new(gfc_vector2d(1000, 900));
     world = world_load("worlds/testworld.world");
     brick = brick_new(gfc_vector2d(1050, 900));
-
+    question_block = question_block_new(gfc_vector2d(1100, 900));
+    invisible_question_block = invisible_question_block_new(gfc_vector2d(1150, 900));
+    platform = platform_new(gfc_vector2d(1200, 900));
 
     slog("press [escape] to quit");
 
