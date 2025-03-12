@@ -65,13 +65,14 @@ void player_think(Entity* self) {
 	int move_direction;
 	float acceleration;
 	float friction;
-	float jump_velocity;
+	GFC_Vector2D jump_velocity = { 0 };
+	float x_velocity;
 
 	if (!self|| !self->data) {
 		return;
 	}
 	data = (PlayerEntityData*)self->data;
-	jump_velocity = JUMP_VELOCITY;
+	gfc_vector2d_set(jump_velocity, self->physics->velocity.x, JUMP_VELOCITY);
 
 	if (self->physics->x_world_collision) { //collision with a wall
 		data->last_x_collision_dir = self->physics->x_world_collision; //save the last collision direction
@@ -138,6 +139,8 @@ void player_think(Entity* self) {
 	else {
 		self->physics->running = 0;
 	}
+
+
 	if (gfc_input_command_down("down") && self->physics->grounded && !self->physics->override_horizontal_velocity_cap && !data->ground_pound_recovery) {// player starts crouching
 		self->physics->bounds.h /= 2;
 		self->physics->bounds.y += self->physics->bounds.h;
@@ -147,7 +150,8 @@ void player_think(Entity* self) {
 	}
 	if (data->crouching) {
 		self->physics->running = 0;
-		jump_velocity = CROUCH_JUMP_VELOCITY;
+		x_velocity = fabs(self->physics->velocity.x) > LONG_JUMP_THRESHOLD ? copysign(LONG_JUMP_VELOCITY, self->physics->velocity.x) : self->physics->velocity.x; //check to see if were moving fast enough to long jump
+		gfc_vector2d_set(jump_velocity, x_velocity, CROUCH_JUMP_VELOCITY);
 		if (!gfc_input_command_down("down")) {
 
 			//resize hitbox to normal
@@ -187,11 +191,10 @@ void player_think(Entity* self) {
 
 	if (gfc_input_command_pressed("jump")) {
 		if (self->physics->grounded) { //normal jump
-			self->physics->velocity.y = jump_velocity;
+			self->physics->velocity = jump_velocity;
 		}
 		else if (self->physics->x_world_collision || data->wall_jump_buffer > 0) { //wall jump
-			self->physics->velocity.x = -data->last_x_collision_dir * WALL_JUMP_VELOCITY;
-			self->physics->velocity.y = jump_velocity;
+			self->physics->velocity = gfc_vector2d(-data->last_x_collision_dir * WALL_JUMP_VELOCITY, JUMP_VELOCITY);
 			data->wall_jump_buffer = 0;
 		}
 		else { //buffer a jump
@@ -199,12 +202,11 @@ void player_think(Entity* self) {
 		}
 	}
 	else if (self->physics->grounded && data->jump_buffer > 0) { //buffered jump
-			self->physics->velocity.y = jump_velocity;
+			self->physics->velocity = jump_velocity;
 			data->jump_buffer = 0;
 	}
 	else if ((self->physics->x_world_collision || data->wall_jump_buffer > 0) && data->jump_buffer > 0) { //buffered wall jump
-		self->physics->velocity.x = -data->last_x_collision_dir * WALL_JUMP_VELOCITY;
-		self->physics->velocity.y = jump_velocity;
+		self->physics->velocity = gfc_vector2d(-data->last_x_collision_dir * WALL_JUMP_VELOCITY, JUMP_VELOCITY);
 		data->wall_jump_buffer = 0;
 		data->jump_buffer = 0;
 	}
@@ -214,7 +216,7 @@ void player_think(Entity* self) {
 			data->ground_pound_recovery = 0;
 			self->physics->velocity.y *= GROUND_POUND_RECOVERY_JUMP_BOOST; //groundpound jump boost
 		}
-		else {
+		else if (self->physics->grounded) {
 			self->physics->acceleration.x = self->physics->velocity.x = 0;
 		}
 	}

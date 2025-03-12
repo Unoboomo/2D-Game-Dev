@@ -26,6 +26,9 @@
 #define CROUCH_MAX_VELOCITY 0.5
 #define CROUCH_JUMP_VELOCITY -6
 
+#define LONG_JUMP_THRESHOLD 3.5
+#define LONG_JUMP_VELOCITY 6
+
 
 
 typedef struct PlayerEntityData_s

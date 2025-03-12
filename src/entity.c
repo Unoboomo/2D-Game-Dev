@@ -229,7 +229,7 @@ void entity_update_position(Entity* self) {
 				continue;
 			}
 			//handle collisions, probably run other's touch function
-			slog("%s is colliding with %s", self->name, other->name);
+			//slog("%s is colliding with %s", self->name, other->name);
 		}
 	}
 	gfc_list_delete(entity_collisions);
