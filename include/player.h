@@ -3,7 +3,6 @@
 
 #include "entity.h"
 
-#define JUMPGRAV ((GFC_Vector2D) {(float) 0, (float) 0.2})
 
 #define GROUND_ACCELERATION 0.04
 #define MIDAIR_ACCELERATION 0.04

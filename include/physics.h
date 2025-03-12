@@ -7,6 +7,7 @@
 
 #define FGRAV ((GFC_Vector2D) {(float) 0, (float) 0.7})
 #define ZEROGRAV ((GFC_Vector2D) {(float) 0, (float) 0})
+#define JUMPGRAV ((GFC_Vector2D) {(float) 0, (float) 0.2})
 
 
 typedef struct Physics_Object_s

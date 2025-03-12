@@ -25,7 +25,6 @@ Entity* bug_new(GFC_Vector2D position) {
 	entity_set_collision_layer(self, ECL_Entity);
 
 	self->frame = 0;
-
 	gfc_vector2d_copy(self->physics->position, position);
 
 	self->think = bug_think;
@@ -63,7 +62,7 @@ void bug_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 	}
 
 	if (other->player) {
-		if (collision_side.y < 0) {//if collision was top
+		if (collision_side.y < 0 && !physics_obj_collision_check(self->physics, other->physics)) {//if collision was top
 			entity_free(self);
 		}
 		else {
