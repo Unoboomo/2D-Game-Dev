@@ -11,6 +11,7 @@
 #include "entity.h"
 #include "player.h"
 #include "world.h"
+#include "coin.h"
 
 Uint8 _DRAWBOUNDS = 0;
 
@@ -30,6 +31,7 @@ int main(int argc, char * argv[])
     
     Entity* player;
     Entity* bug;
+    Entity* coin;
 
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -54,6 +56,7 @@ int main(int argc, char * argv[])
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new(gfc_vector2d(20, 20));
     bug = bug_new(gfc_vector2d(200, 200));
+    coin = coin_new(gfc_vector2d(1000, 900));
     world = world_load("worlds/testworld.world");
 
     slog("press [escape] to quit");

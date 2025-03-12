@@ -31,15 +31,19 @@ Entity* player_new(GFC_Vector2D position) {
 	self->frame = 0;
 
 	gfc_vector2d_copy(self->physics->position, position);
+
 	self->player = 1;
 	self->think = player_think;
 	self->update = player_update;
 	self->free = player_free;
 	
+	entity_set_collision_layer(self, ECL_ALL);
+
 	data = gfc_allocate_array(sizeof(PlayerEntityData), 1);
 	if (data) {
 		//set data here
 		self->data = data;
+		data->lives_count = 5;
 		slog("data is set");
 	}
 	else {
@@ -83,7 +87,6 @@ void player_think(Entity* self) {
 			data->wall_jump_buffer = WALL_JUMP_BUFFER; //buffers a wall jump
 		}
 	}
-
 	if (data->jump_buffer > 0) {
 		data->jump_buffer--;
 	}

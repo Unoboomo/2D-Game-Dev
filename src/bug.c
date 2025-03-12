@@ -1,7 +1,5 @@
 #include "simple_logger.h"
 
-#include "gfc_input.h"
-
 #include "gf2d_graphics.h"
 
 #include "bug.h"

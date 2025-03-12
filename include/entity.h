@@ -18,11 +18,11 @@ typedef enum {
 }EntityTeamType;
 
 typedef enum {
-	ECL_none = 1,
+	ECL_none = 0,
 	ECL_World = 2,
 	ECL_Entity = 4,
 	ECL_Item = 8,
-	ECL_ALL = 15
+	ECL_ALL = 14
 }EntityCollisionLayers;
 
 typedef struct Entity_s
@@ -42,6 +42,7 @@ typedef struct Entity_s
 
 	void					(*think)(struct Entity_s* self);	//pointer to a think function
 	void					(*update)(struct Entity_s* self);	//pointer to a update function (all entities can think based on the same gamestate, then update all)
+	void					(*touch)(struct Entity_s* self, struct Entity_s* other);	//pointer to a touch function 
 	void					(*free)(struct Entity_s* self);		//pointer to a free function
 
 	void					*data;								//the storage for unique entity type data, eg. (gclient, monsterdata, itemdata, etc.)			
@@ -112,6 +113,28 @@ void entity_configure(Entity* self, SJson* json);
 * @param *self a pointer to the entity to update the position of
 */
 void entity_update_position(Entity* self);
+
+/**
+* @brief checks the entity layers collide with the other layers
+* @param *self a pointer to the entity to check the layers of
+* @param layer the layers to check against
+* @return the matching bitmask (will be 0 if no overlap, a non-zero otherwise)
+*/
+Uint8 entity_check_layer(Entity* self, EntityCollisionLayers layer);
+
+/**
+* @brief updates an entity's layer bitmask with a new layer
+* @param *self a pointer to the entity to update the layers of
+* @param layer the layer(s) to add 
+*/
+void entity_set_collision_layer(Entity* self, EntityCollisionLayers layer);
+
+/**
+* @brief updates an entity's layer bitmask by removing a layer
+* @param *self a pointer to the entity to update the layers of
+* @param layer the layer(s) to remove
+*/
+void entity_remove_collision_layer(Entity* self, EntityCollisionLayers layer);
 
 /**
 * @brief ensures an entity is still in the world/window/camera bounds

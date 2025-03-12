@@ -228,8 +228,14 @@ void entity_update_position(Entity* self) {
 			if (!other) {
 				continue;
 			}
+			
 			//handle collisions, probably run other's touch function
-			//slog("%s is colliding with %s", self->name, other->name);
+			if (!strcmp(self->name,"player_class")) {
+				slog("%s is colliding with %s", self->name, other->name);
+			}
+			if (other->touch) {
+				other->touch(other, self);
+			}
 		}
 	}
 	gfc_list_delete(entity_collisions);
@@ -239,18 +245,19 @@ void entity_update_position(Entity* self) {
 	entity_check_world_bounds(self);
 }
 
-/*
+
 Uint8 entity_check_layer(Entity* self, EntityCollisionLayers layer) {
 	if (!self) {
-		return;
+		return ECL_none;
 	}
 	return self->layer & layer;
 }
 
 void entity_set_collision_layer(Entity* self, EntityCollisionLayers layer) {
 	if (!self) {
-		self->layer |= layer;
+		return;
 	}
+	self->layer |= layer;
 }
 
 void entity_remove_collision_layer(Entity* self, EntityCollisionLayers layer) {
@@ -259,7 +266,7 @@ void entity_remove_collision_layer(Entity* self, EntityCollisionLayers layer) {
 	}
 	self->layer &= ~layer;
 }
-*/
+
 
 void entity_check_world_bounds(Entity* self) {
 	GFC_Rect bounds;
@@ -297,6 +304,9 @@ GFC_List* entity_collide_all(Entity* self) {
 			continue;
 		}
 		if (self == &entity_system.entity_list[i]) {
+			continue;
+		}
+		if (!entity_check_layer(self, entity_system.entity_list[i].layer)) {
 			continue;
 		}
 		if (physics_obj_collision_check(self->physics, entity_system.entity_list[i].physics)) { 
