@@ -295,7 +295,7 @@ void entity_collide_all(Entity* self) {
 	gfc_vector2d_sub(bounds, bounds, self->physics->center);
 
 	for (i = 0; i < entity_system.entity_max; i++) { //y change test
-		if (!entity_system.entity_list[i]._inuse|| self == &entity_system.entity_list[i] || self->player) {
+		if (!entity_system.entity_list[i]._inuse|| self == &entity_system.entity_list[i] || entity_system.entity_list[i].player) {
 			continue;
 		}
 		if (!entity_check_layer(self, entity_system.entity_list[i].layer)) {

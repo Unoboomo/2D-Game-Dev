@@ -6,6 +6,7 @@
 
 void bug_think(Entity* self);
 void bug_update(Entity* self);
+void bug_touch(Entity* self, Entity* other, GFC_Vector2D collision_side);
 
 Entity* bug_new(GFC_Vector2D position) {
 	Entity* self;
@@ -20,13 +21,16 @@ Entity* bug_new(GFC_Vector2D position) {
 		return NULL;
 	}
 	entity_configure_from_file(self, "def/bug.def");
+
+	entity_set_collision_layer(self, ECL_Entity);
+
 	self->frame = 0;
 
 	gfc_vector2d_copy(self->physics->position, position);
 
 	self->think = bug_think;
 	self->update = bug_update;
-	
+	self->touch = bug_touch;
 	return self;
 }
 
@@ -51,4 +55,19 @@ void bug_update(Entity* self) {
 		self->frame = 0;
 	}
 	entity_update_position(self);
+}
+
+void bug_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
+	if (!self || !other) {
+		return;
+	}
+
+	if (other->player) {
+		if (collision_side.y < 0) {//if collision was top
+			entity_free(self);
+		}
+		else {
+			//damage player
+		}
+	}
 }

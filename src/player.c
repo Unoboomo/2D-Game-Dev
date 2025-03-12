@@ -161,7 +161,7 @@ void player_think(Entity* self) {
 			self->physics->bounds.y -= self->physics->bounds.h;
 			self->physics->bounds.h *= 2;
 			//test to see if can uncrouch
-			if (!world_test_collision_rect(world_get_active(), physics_obj_get_world_bounds_position(self->physics))) {
+			if (!world_test_collision_rect(world_get_active(), physics_obj_get_world_bounds_position(self->physics))) { //ERROR HERE, doesnt check for entity world objects, will clip
 				self->physics->override_horizontal_velocity_cap = 0;
 				data->crouching = 0;
 			}

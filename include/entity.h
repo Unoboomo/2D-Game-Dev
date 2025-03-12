@@ -14,6 +14,7 @@ typedef enum {
 	ETT_player,
 	ETT_monster,
 	ETT_item,
+	ETT_world,
 	ETT_MAX
 }EntityTeamType;
 
