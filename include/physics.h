@@ -18,10 +18,12 @@ typedef struct Physics_Object_s
 	GFC_Vector2D	gravity;
 
 	float			horizontal_velocity_cap;//the max speed an entity can move horizontally
+	float			override_horizontal_velocity_cap;	//override horizontal velocity cap with this value
+
 	float			horizontal_deceleration;//the acceleration to slow an entity moving past their horizontal velocity cap by
 
 	float			downward_velocity_cap;	//the max speed an entity can move vertically
-	float			override_downward_velocity_cap;	//override downward velocity cap with this one
+	float			override_downward_velocity_cap;	//override downward velocity cap with this value
 
 
 	Uint8			running;				//if 1, doubles the foreward velocity cap

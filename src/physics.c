@@ -65,6 +65,7 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 
 	GFC_Vector2D test_velocity, test_position;
 	GFC_Rect bounds;
+	float horizontal_cap;
 	float downward_cap;
 
 	if (!self) {
@@ -75,12 +76,14 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 	gfc_vector2d_add(test_velocity, self->velocity, self->acceleration); //add player movement acceleration to velocity
 	gfc_vector2d_add(test_velocity, test_velocity, self->gravity); //apply gravity
 
-	if (test_velocity.x > self->horizontal_velocity_cap * (1 + self->running)) {
+	horizontal_cap = self->override_horizontal_velocity_cap ? self->override_horizontal_velocity_cap : self->horizontal_velocity_cap * (1 + self->running);
+	if (test_velocity.x > horizontal_cap) {
 		test_velocity.x -= self->horizontal_deceleration;
 	}
-	if (test_velocity.x < -self->horizontal_velocity_cap * (1 + self->running)) {
+	if (test_velocity.x < -horizontal_cap) {
 		test_velocity.x += self->horizontal_deceleration;
 	}
+
 	downward_cap = self->override_downward_velocity_cap ? self->override_downward_velocity_cap : self->downward_velocity_cap;
 	if (test_velocity.y > downward_cap) {
 		test_velocity.y = downward_cap;

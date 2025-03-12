@@ -23,6 +23,8 @@
 #define GROUND_POUND_RECOVERY 15
 #define GROUND_POUND_RECOVERY_JUMP_BOOST 1.2
 
+#define CROUCH_MAX_VELOCITY 0.5
+
 
 
 typedef struct PlayerEntityData_s
@@ -34,6 +36,8 @@ typedef struct PlayerEntityData_s
 	Uint8	ground_pound_delay;		//freezes the player's movement to perform the ground pound
 	Uint8	ground_pounding;		//is the player ground pounding?
 	Uint8	ground_pound_recovery;	//freezes the player's movement while recovering from the ground
+
+	Uint8	crouching;				//is the player crouching?
 }PlayerEntityData;
 /**
 * @brief spawn a new player entity

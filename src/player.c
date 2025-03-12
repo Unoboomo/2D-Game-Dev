@@ -5,6 +5,7 @@
 #include "gf2d_graphics.h"
 
 #include "camera.h"
+#include "world.h"
 
 #include "player.h"
 
@@ -56,7 +57,6 @@ void player_free(Entity* self) {
 	data = self->data;
 	//other cleanup here
 	free(data);
-	slog("data is freedd");
 	self->data = NULL;
 }
 
@@ -137,7 +137,31 @@ void player_think(Entity* self) {
 	else {
 		self->physics->running = 0;
 	}
+	if (gfc_input_command_down("down") && self->physics->grounded && !self->physics->override_horizontal_velocity_cap) {// player starts crouching
+		self->physics->bounds.h /= 2;
+		self->physics->bounds.y += self->physics->bounds.h;
+		self->physics->override_horizontal_velocity_cap = CROUCH_MAX_VELOCITY;
+		self->physics->running = 0;
+		data->crouching = 1;
+	}
+	if (data->crouching) {
+		self->physics->running = 0;
+		if (!gfc_input_command_down("down")) {
 
+			//resize hitbox to normal
+			self->physics->bounds.y -= self->physics->bounds.h;
+			self->physics->bounds.h *= 2;
+			//test to see if can uncrouch
+			if (!world_test_collision_rect(world_get_active(), physics_obj_get_world_bounds_position(self->physics))) {
+				self->physics->override_horizontal_velocity_cap = 0;
+				data->crouching = 0;
+			}
+			else {
+				self->physics->bounds.h /= 2;
+				self->physics->bounds.y += self->physics->bounds.h;
+			}
+		}
+	}
 	
 	if (gfc_input_command_down("right") != gfc_input_command_down("left")) { // Moving in a single direction
 		move_direction = gfc_input_command_down("right") ? 1 : -1; // 1 for right, -1 for left
