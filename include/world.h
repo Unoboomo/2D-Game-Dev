@@ -77,7 +77,7 @@ void world_setup_camera(World* world);
 /**
 * @brief checks to see a rect collides with the world anywhere
 * @param world the world to check
-* @param bounds the rect being checked
+* @param bounds the rect being checked (in worldspace)
 * @return 1 if the two are colliding, 0 if not
 */
 Uint8 world_test_collision_rect(World* world, GFC_Rect bounds);

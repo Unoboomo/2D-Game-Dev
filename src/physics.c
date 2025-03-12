@@ -55,6 +55,34 @@ GFC_Rect physics_obj_get_world_bounds_position(Physics_Object* self) {
 	gfc_vector2d_sub(bounds_pos, bounds_pos, self->center);
 	return bounds_pos;
 }
+GFC_Vector2D physics_get_test_position(Physics_Object* self) {
+	GFC_Vector2D test_velocity;
+	GFC_Vector2D test_position = { 0 };
+	float horizontal_cap;
+	float downward_cap;
+
+	if (!self) {
+		return test_position;
+	}
+	gfc_vector2d_add(test_velocity, self->velocity, self->acceleration); //add player movement acceleration to velocity
+	gfc_vector2d_add(test_velocity, test_velocity, self->gravity); //apply gravity
+
+	horizontal_cap = self->override_horizontal_velocity_cap ? self->override_horizontal_velocity_cap : self->horizontal_velocity_cap * (1 + self->running);
+	if (test_velocity.x > horizontal_cap) {
+		test_velocity.x -= self->horizontal_deceleration;
+	}
+	if (test_velocity.x < -horizontal_cap) {
+		test_velocity.x += self->horizontal_deceleration;
+	}
+
+	downward_cap = self->override_downward_velocity_cap ? self->override_downward_velocity_cap : self->downward_velocity_cap;
+	if (test_velocity.y > downward_cap) {
+		test_velocity.y = downward_cap;
+	}
+
+	gfc_vector2d_add(test_position, self->position, test_velocity);
+	return test_position;
+}
 
 void physics_update(Physics_Object* self) { //check if collision happens after addition but before changing the variables, if there is, handle that and cancel movement?
 
@@ -74,7 +102,9 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 
 
 	gfc_vector2d_add(test_velocity, self->velocity, self->acceleration); //add player movement acceleration to velocity
+
 	gfc_vector2d_add(test_velocity, test_velocity, self->gravity); //apply gravity
+	
 
 	horizontal_cap = self->override_horizontal_velocity_cap ? self->override_horizontal_velocity_cap : self->horizontal_velocity_cap * (1 + self->running);
 	if (test_velocity.x > horizontal_cap) {
@@ -99,45 +129,52 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 	bounds.x = bounds.x + self->position.x;
 	gfc_vector2d_sub(bounds, bounds, self->center);
 
-	if (!world_test_collision_rect(world_get_active(), bounds)) { //no y direction collision
-		//apply physics in the y direction:
-		self->velocity.y = test_velocity.y;
-		self->position.y = test_position.y;
-		self->grounded = 0;
-	}
-	else { // y direction collision
-		self->velocity.y = 0; //whether we bonked (velocity.y < 0) or are grounded (velocity.y > 0), set velocity.y to 0
-
-		if (test_velocity.y > 0) { //if velocity is positive and a collision happened, we are grounded
-			self->grounded = 1;
-		}
-		else {
+	if (!self->y_collided_prev) {
+		if (!world_test_collision_rect(world_get_active(), bounds)) { //no y direction collision
+			//apply physics in the y direction:
+			self->velocity.y = test_velocity.y;
+			self->position.y = test_position.y;
 			self->grounded = 0;
 		}
+		else { // y direction collision
+			self->velocity.y = 0; //whether we bonked (velocity.y < 0) or are grounded (velocity.y > 0), set velocity.y to 0
+
+			if (test_velocity.y > 0) { //if velocity is positive and a collision happened, we are grounded
+				self->grounded = 1;
+			}
+			else {
+				self->grounded = 0;
+			}
+		}
 	}
+
 
 	bounds.y = self->bounds.y + self->position.y; //if no collision, self->position.y was changed, if not, not changed. either way, we need it for next bounds test
 	bounds.x = self->bounds.x + test_position.x;
 	gfc_vector2d_sub(bounds, bounds, self->center);
 
+	if (!self->x_collided_prev) {
+		if (!world_test_collision_rect(world_get_active(), bounds)) { //no x direction collision
+			self->velocity.x = test_velocity.x;
+			self->position.x = test_position.x;
+			self->x_world_collision = 0;
 
-	if (!world_test_collision_rect(world_get_active(), bounds)) { //no x direction collision
-		self->velocity.x = test_velocity.x;
-		self->position.x = test_position.x;
-		self->x_world_collision = 0;
-
-	}
-	else { //x direction collision
-		self->velocity.x = 0;
-		self->acceleration.x = 0;
-
-		if (test_velocity.x > 0) {
-			self->x_world_collision = 1;
 		}
-		else if (test_velocity.x < 0) {
-			self->x_world_collision = -1;
+		else { //x direction collision
+			self->velocity.x = 0;
+			self->acceleration.x = 0;
+
+			if (test_velocity.x > 0) {
+				self->x_world_collision = 1;
+			}
+			else if (test_velocity.x < 0) {
+				self->x_world_collision = -1;
+			}
 		}
 	}
+
+	self->x_collided_prev = self->y_collided_prev = 0;
+
 }
 
 Uint8 physics_obj_collision_check(Physics_Object* self, Physics_Object* other) { 
@@ -154,4 +191,16 @@ Uint8 physics_obj_collision_check(Physics_Object* self, Physics_Object* other) {
 
 	//will eventually need to know what side the colission is for killing/dying, but not yet
 	return gfc_rect_overlap(bounds1, bounds2);
+}
+
+Uint8 physics_obj_test_collision_rect(Physics_Object* self, GFC_Rect bounds) {
+	GFC_Rect bounds1;
+	if (!self) {
+		return 0;
+	}
+
+	bounds1 = physics_obj_get_world_bounds_position(self);
+	return gfc_rect_overlap(bounds1, bounds);
+
+	;
 }

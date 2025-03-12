@@ -26,6 +26,8 @@ typedef struct Physics_Object_s
 	float			downward_velocity_cap;	//the max speed an entity can move vertically
 	float			override_downward_velocity_cap;	//override downward velocity cap with this value
 
+	Uint8			y_collided_prev;		//if this physics object has collided with something in the y dir this frame
+	Uint8			x_collided_prev;		//if this physics object has collided with something in the x dir this frame
 
 	Uint8			running;				//if 1, doubles the foreward velocity cap
 	Uint8			grounded;				//if the physics object is touching the ground
@@ -86,6 +88,13 @@ void physics_obj_configure(Physics_Object* self, SJson* json);
 GFC_Rect physics_obj_get_world_bounds_position(Physics_Object* self);
 
 /**
+* @brief calculates proposed change in velocity and position of a physics object
+* @param self the physics object to check
+* @return NULL on error, or a GFC_Vector2D holding the proposed position
+*/
+GFC_Vector2D physics_get_test_position(Physics_Object* self);
+
+/**
 * @brief calculates changes in position and velocity
 * @param self the physics object to update
 * @return NULL on error, or a pointer to the spawned player entity
@@ -99,4 +108,13 @@ void physics_update(Physics_Object* self);
 * @return 1 if the objects are colliding, 0 if not
 */
 Uint8 physics_obj_collision_check(Physics_Object* self, Physics_Object* other);
+
+/**
+* @brief checks to see a rect collides with a physics object
+* @param *self the physics object to check
+* @param bounds the rect being checked (in worldspace)
+* @return 1 if the two are colliding, 0 if not
+*/
+Uint8 physics_obj_test_collision_rect(Physics_Object* self, GFC_Rect bounds);
+
 #endif

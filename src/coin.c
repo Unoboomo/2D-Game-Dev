@@ -6,7 +6,7 @@
 
 #include "coin.h"
 
-void coin_touch(Entity* self, Entity* other);
+void coin_touch(Entity* self, Entity* other, GFC_Vector2D collision_side);
 
 Entity* coin_new(GFC_Vector2D position) {
 	Entity* self;
@@ -33,7 +33,7 @@ Entity* coin_new(GFC_Vector2D position) {
 	return self;
 }
 
-void coin_touch(Entity* self, Entity* other) {
+void coin_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 	PlayerEntityData* data;
 	if (!self || !other) {
 		return;

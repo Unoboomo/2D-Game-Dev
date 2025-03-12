@@ -42,7 +42,7 @@ typedef struct Entity_s
 
 	void					(*think)(struct Entity_s* self);	//pointer to a think function
 	void					(*update)(struct Entity_s* self);	//pointer to a update function (all entities can think based on the same gamestate, then update all)
-	void					(*touch)(struct Entity_s* self, struct Entity_s* other);	//pointer to a touch function 
+	void					(*touch)(struct Entity_s* self, struct Entity_s* other, GFC_Vector2D collision_side);	//pointer to a touch function 
 	void					(*free)(struct Entity_s* self);		//pointer to a free function
 
 	void					*data;								//the storage for unique entity type data, eg. (gclient, monsterdata, itemdata, etc.)			
@@ -143,10 +143,8 @@ void entity_remove_collision_layer(Entity* self, EntityCollisionLayers layer);
 void entity_check_world_bounds(Entity* self);
 
 /**
-* @brief gets a list of all colliding entities,
+* @brief checks an entity's prospective position for collision against other entities,
 * @param *self a pointer to the entity to check with
-* @return Null if there are no collisions, a list of entity pointers otherwise
-* @note any list returned must be freed with gfc_list_delete()
 */
-GFC_List* entity_collide_all(Entity* self);
+void entity_collide_all(Entity* self);
 #endif

@@ -212,33 +212,12 @@ void entity_configure(Entity* self, SJson* json)
 }
 
 void entity_update_position(Entity* self) {
-	GFC_List* entity_collisions;
-	Entity* other;
-	int i,count;
+
 	if (!self || !self->physics) {
-		return;
+		return; 
 	}
 	
-	entity_collisions = entity_collide_all(self);
-
-	if (entity_collisions) {
-		count = gfc_list_count(entity_collisions);
-		for (i = 0; i < count; i++) {
-			other = gfc_list_nth(entity_collisions, i);
-			if (!other) {
-				continue;
-			}
-			
-			//handle collisions, probably run other's touch function
-			if (!strcmp(self->name,"player_class")) {
-				slog("%s is colliding with %s", self->name, other->name);
-			}
-			if (other->touch) {
-				other->touch(other, self);
-			}
-		}
-	}
-	gfc_list_delete(entity_collisions);
+	entity_collide_all(self);
 	
 	physics_update(self->physics);
 
@@ -293,29 +272,98 @@ void entity_check_world_bounds(Entity* self) {
 }
 
 
-GFC_List* entity_collide_all(Entity* self) {
+void entity_collide_all(Entity* self) {
 	int i;
-	GFC_List* entities = gfc_list_new();
-	if (!self) {
-		return NULL;
+	GFC_Rect bounds;
+	GFC_Vector2D test_position;
+	GFC_Vector2D velocity_dir;
+	GFC_Vector2D collision_side; //this is in relation to the entity we collided with, if velocity.y is + (self moving down), this is (0,-1), etc.
+
+	if (!self || !self->physics) {
+		return;
 	}
-	for (i = 0; i < entity_system.entity_max; i++) {
-		if (!entity_system.entity_list[i]._inuse) {
-			continue;
-		}
-		if (self == &entity_system.entity_list[i]) {
+	self->physics->x_collided_prev = self->physics->y_collided_prev = 0;
+	//get test position of entity
+	test_position = physics_get_test_position(self->physics);
+
+	velocity_dir = gfc_vector2d(test_position.x - self->physics->position.x, test_position.y - self->physics->position.y);
+	
+	//get collision bounds for y direction test
+	gfc_rect_copy(bounds, self->physics->bounds);
+	bounds.y = bounds.y + test_position.y;
+	bounds.x = bounds.x + self->physics->position.x;
+	gfc_vector2d_sub(bounds, bounds, self->physics->center);
+
+	for (i = 0; i < entity_system.entity_max; i++) { //y change test
+		if (!entity_system.entity_list[i]._inuse|| self == &entity_system.entity_list[i] || self->player) {
 			continue;
 		}
 		if (!entity_check_layer(self, entity_system.entity_list[i].layer)) {
 			continue;
 		}
-		if (physics_obj_collision_check(self->physics, entity_system.entity_list[i].physics)) { 
-			gfc_list_append(entities, &entity_system.entity_list[i]);
+		if (physics_obj_test_collision_rect(entity_system.entity_list[i].physics, bounds)) {
+
+			if (entity_check_layer(&entity_system.entity_list[i], ECL_World)) { //if this, we treat as a world collision
+				test_position.y = self->physics->position.y;
+				self->physics->velocity.y = 0; //whether we bonked (velocity.y < 0) or are grounded (velocity.y > 0), set velocity.y to 0
+
+				if (velocity_dir.y > 0) { //if velocity is positive and a collision happened, we are grounded
+					self->physics->grounded = 1;
+				}
+				else {
+					self->physics->grounded = 0;
+				}
+				self->physics->y_collided_prev = 1; //let physics_update to not try movement in the y direction
+			}
+			collision_side = velocity_dir.y > 0 ? gfc_vector2d(0, -1) : gfc_vector2d(0, 1);
+			if (!strcmp(self->name, "player_class")) {
+				slog("%s is colliding with %s", self->name, entity_system.entity_list[i].name);
+			}
+			
+			if (entity_system.entity_list[i].touch) {
+				entity_system.entity_list[i].touch(&entity_system.entity_list[i], self, collision_side);
+			}
+			
 		}
 	}
-	if (!gfc_list_count(entities)) {
-		gfc_list_delete(entities);
-		return NULL;
+
+	//get collision bounds for x direction test
+	bounds.y = self->physics->bounds.y + test_position.y; //logic here is wonky if we have a worldlike collision in the y direction
+	bounds.x = self->physics->bounds.x + test_position.x;
+	gfc_vector2d_sub(bounds, bounds, self->physics->center);
+
+	for (i = 0; i < entity_system.entity_max; i++) { //x change test
+		if (!entity_system.entity_list[i]._inuse || self == &entity_system.entity_list[i]) {
+			continue;
+		}
+		if (!entity_check_layer(self, entity_system.entity_list[i].layer)) {
+			continue;
+		}
+		if (physics_obj_test_collision_rect(entity_system.entity_list[i].physics, bounds)) {
+			if (entity_check_layer(&entity_system.entity_list[i], ECL_World)) { //if this, we treat as a world collision
+				self->physics->velocity.x = 0;
+				self->physics->acceleration.x = 0;
+
+				if (velocity_dir.x > 0) {
+					self->physics->x_world_collision = 1;
+				}
+				else if (velocity_dir.x < 0) {
+					self->physics->x_world_collision = -1;
+				}
+
+				self->physics->x_collided_prev = 1; //let physics_update to not try movement in the x direction
+
+			}
+			collision_side = velocity_dir.x > 0 ? gfc_vector2d(-1, 0) : gfc_vector2d(1,0);
+
+			if (!strcmp(self->name, "player_class")) {
+				slog("%s is colliding with %s", self->name, entity_system.entity_list[i].name);
+			}
+			
+			if (entity_system.entity_list[i].touch) {
+				entity_system.entity_list[i].touch(&entity_system.entity_list[i], self, collision_side);
+			}
+			
+		}
 	}
-	return entities;
 }
