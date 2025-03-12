@@ -6,6 +6,7 @@
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
 
+#include "font.h"
 #include "bug.h"
 #include "camera.h"
 #include "entity.h"
@@ -40,6 +41,10 @@ int main(int argc, char * argv[])
     Entity* invisible_question_block;
     Entity* platform;
 
+    char formatted_string[100];
+
+    PlayerEntityData* data;
+
     /*program initializtion*/
     init_logger("gf2d.log",0);
     parse_args(argc, argv); //start the game in some other mode
@@ -55,6 +60,7 @@ int main(int argc, char * argv[])
     gfc_input_init("config/input.cfg");
     gf2d_graphics_set_frame_delay(16);
     gf2d_sprite_init(1024);
+    font_init();
     entity_system_init(128); 
     SDL_ShowCursor(SDL_DISABLE);
     camera_set_size(gfc_vector2d(1280, 720));
@@ -70,6 +76,9 @@ int main(int argc, char * argv[])
     invisible_question_block = invisible_question_block_new(gfc_vector2d(1150, 900));
     platform = platform_new(gfc_vector2d(1200, 900));
 
+
+    data = (PlayerEntityData*)player->data;
+  
     slog("press [escape] to quit");
 
     /*main game loop*/
@@ -77,6 +86,7 @@ int main(int argc, char * argv[])
     {
         gfc_input_update(); // update SDL's internal event structures and input data
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
+        font_cleanup();
         /*update things here*/
         SDL_GetMouseState(&mx,&my);
         mf+=0.1;
@@ -85,6 +95,8 @@ int main(int argc, char * argv[])
         entity_system_think_all();
         entity_system_update_all();
 
+        sprintf(formatted_string, "Coins: %d\nLives: %d", data->coin_count, data->lives_count);
+
         gf2d_graphics_clear_screen();// clears drawing buffers
         // all drawing should happen betweem clear_screen and next_frame
             //backgrounds drawn first
@@ -92,6 +104,8 @@ int main(int argc, char * argv[])
 
             //draw entities next
             entity_system_draw_all();
+
+            font_draw_test(formatted_string, FS_medium, GFC_COLOR_WHITE, gfc_vector2d(10, 10));
 
             //UI elements last
             gf2d_sprite_draw(
