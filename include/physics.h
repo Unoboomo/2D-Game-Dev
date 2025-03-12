@@ -6,7 +6,7 @@
 #include "gfc_shape.h"
 
 #define FGRAV ((GFC_Vector2D) {(float) 0, (float) 0.7})
-#define JUMPGRAV ((GFC_Vector2D) {(float) 0, (float) 0.2})
+
 
 typedef struct Physics_Object_s
 {
@@ -21,6 +21,8 @@ typedef struct Physics_Object_s
 	float			horizontal_deceleration;//the acceleration to slow an entity moving past their horizontal velocity cap by
 
 	float			downward_velocity_cap;	//the max speed an entity can move vertically
+	float			override_downward_velocity_cap;	//override downward velocity cap with this one
+
 
 	Uint8			running;				//if 1, doubles the foreward velocity cap
 	Uint8			grounded;				//if the physics object is touching the ground

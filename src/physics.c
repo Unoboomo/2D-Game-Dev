@@ -6,13 +6,12 @@
 
 Physics_Object* physics_obj_new() {
 	Physics_Object* obj;
-    obj = malloc(sizeof(Physics_Object));
+    obj = gfc_allocate_array(sizeof(Physics_Object),1);
     if (!obj)
     {
         slog("failed to allocate space for physics obj");
         return NULL;
     }
-	memset(obj, 0, sizeof(Physics_Object));
 	return obj;
 }
 
@@ -66,10 +65,12 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 
 	GFC_Vector2D test_velocity, test_position;
 	GFC_Rect bounds;
+	float downward_cap;
 
 	if (!self) {
 		return;
 	}
+
 
 	gfc_vector2d_add(test_velocity, self->velocity, self->acceleration); //add player movement acceleration to velocity
 	gfc_vector2d_add(test_velocity, test_velocity, self->gravity); //apply gravity
@@ -80,8 +81,9 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 	if (test_velocity.x < -self->horizontal_velocity_cap * (1 + self->running)) {
 		test_velocity.x += self->horizontal_deceleration;
 	}
-	if (test_velocity.y > self->downward_velocity_cap) {
-		test_velocity.y = self->downward_velocity_cap;
+	downward_cap = self->override_downward_velocity_cap ? self->override_downward_velocity_cap : self->downward_velocity_cap;
+	if (test_velocity.y > downward_cap) {
+		test_velocity.y = downward_cap;
 	}
 
 	gfc_vector2d_add(test_position, self->position, test_velocity);

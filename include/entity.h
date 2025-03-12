@@ -29,6 +29,8 @@ typedef struct Entity_s
 {
 	Uint8					_inuse;								//memory management flag
 
+	Uint8					player;								//1 if player, 0 otherwise
+
 	GFC_TextLine			name;								//name of the entity for debugging
 	EntityTeamType			team;								//which team this entity is on
 	EntityCollisionLayers	layer;								//bitmask for layers, only same layer can collide	

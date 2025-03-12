@@ -30,13 +30,12 @@ Entity* player_new(GFC_Vector2D position) {
 	self->frame = 0;
 
 	gfc_vector2d_copy(self->physics->position, position);
-	
+	self->player = 1;
 	self->think = player_think;
 	self->update = player_update;
 	self->free = player_free;
 	
 	data = gfc_allocate_array(sizeof(PlayerEntityData), 1);
-	memset(data, 0, sizeof(PlayerEntityData));
 	if (data) {
 		//set data here
 		self->data = data;
@@ -72,6 +71,7 @@ void player_think(Entity* self) {
 	}
 	data = (PlayerEntityData*)self->data;
 
+
 	if (self->physics->x_world_collision) { //collision with a wall
 		data->last_x_collision_dir = self->physics->x_world_collision; //save the last collision direction
 		if (!self->physics->grounded) { //wall sliding
@@ -82,12 +82,54 @@ void player_think(Entity* self) {
 		}
 	}
 
-	if (gfc_input_command_held("jump") || self->physics->velocity.y >= 0) { 
-		self->physics->gravity = JUMPGRAV;
+	if (data->jump_buffer > 0) {
+		data->jump_buffer--;
 	}
-	else { //jump held or falling, apply lighter gravity
-		self->physics->gravity = FGRAV;
+	if (data->wall_jump_buffer > 0) {
+		data->wall_jump_buffer--;
 	}
+	if (data->ground_pound_delay > 0) {
+		data->ground_pound_delay--;
+	}
+	if (data->ground_pound_recovery > 0) {
+		data->ground_pound_recovery--;
+	}
+
+	if (gfc_input_command_pressed("down") && !self->physics->grounded && (!data->ground_pounding || data->ground_pound_delay == 1)) { //ground pounding logic (intentional infinite height glitch, frame perfect tho)
+		data->ground_pounding = 1;
+		data->ground_pound_delay = GROUND_POUND_DELAY;
+		gfc_vector2d_set(self->physics->velocity, 0, GROUND_BOUND_BOOST);
+		gfc_vector2d_clear(self->physics->acceleration);
+		self->physics->gravity = ZEROGRAV;
+		return;
+	}
+	if (data->ground_pounding) {
+		if (data->ground_pound_delay > 0) {
+			gfc_vector2d_clear(self->physics->velocity);
+			return;
+		}
+		else {
+			self->physics->gravity = FGRAV;
+			self->physics->override_downward_velocity_cap = GROUND_POUND_VELOCITY_OVERRIDE;
+		}
+		if (self->physics->grounded || gfc_input_command_pressed("up")) {
+			if (self->physics->grounded) {
+				data->ground_pound_recovery = GROUND_POUND_RECOVERY;
+			}
+			data->ground_pounding = 0;
+			self->physics->override_downward_velocity_cap = 0;
+		}
+	}
+
+	if (!data->ground_pounding) { //which gravity to use when not groundpounding
+		if (gfc_input_command_down("jump") || self->physics->velocity.y >= 0) {
+			self->physics->gravity = JUMPGRAV;
+		}
+		else { //jump held or falling, apply lighter gravity
+			self->physics->gravity = FGRAV;
+		}
+	}
+
 
 	if (gfc_input_command_down("dash")) { //running or not
 		self->physics->running = 1;
@@ -96,6 +138,7 @@ void player_think(Entity* self) {
 		self->physics->running = 0;
 	}
 
+	
 	if (gfc_input_command_down("right") != gfc_input_command_down("left")) { // Moving in a single direction
 		move_direction = gfc_input_command_down("right") ? 1 : -1; // 1 for right, -1 for left
 
@@ -114,24 +157,6 @@ void player_think(Entity* self) {
 	else { // No movement input
 		friction = self->physics->grounded ? GROUND_ACCELERATION : MIDAIR_ACCELERATION;
 		self->physics->acceleration.x = -self->physics->velocity.x * friction;
-	}
-
-	if (gfc_input_command_down("up")) { //dev flight, remove eventually
-		self->physics->velocity.y = -6;
-	}
-
-	if (self->physics->x_world_collision > 0) {
-		slog("right world collision");
-	}
-	if (self->physics->x_world_collision < 0) {
-		slog("left world collision");
-	}
-
-	if (data->jump_buffer > 0) { 
-		data->jump_buffer--;
-	}
-	if (data->wall_jump_buffer > 0) { 
-		data->wall_jump_buffer--;
 	}
 
 	if (gfc_input_command_pressed("jump")) {
@@ -156,6 +181,16 @@ void player_think(Entity* self) {
 		self->physics->velocity.y = JUMP_VELOCITY;
 		data->wall_jump_buffer = 0;
 		data->jump_buffer = 0;
+	}
+
+	if (data->ground_pound_recovery) {
+		if (self->physics->velocity.y < 0) { //we jumped out of the recovery
+			data->ground_pound_recovery = 0;
+			self->physics->velocity.y *= GROUND_POUND_RECOVERY_JUMP_BOOST; //groundpound jump boost
+		}
+		else {
+			self->physics->acceleration.x = self->physics->velocity.x = 0;
+		}
 	}
 }
 
