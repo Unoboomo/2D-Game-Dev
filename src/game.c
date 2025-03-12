@@ -12,6 +12,7 @@
 #include "player.h"
 #include "world.h"
 #include "coin.h"
+#include "brick.h"
 
 Uint8 _DRAWBOUNDS = 0;
 
@@ -32,6 +33,7 @@ int main(int argc, char * argv[])
     Entity* player;
     Entity* bug;
     Entity* coin;
+    Entity* brick;
 
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -58,6 +60,8 @@ int main(int argc, char * argv[])
     bug = bug_new(gfc_vector2d(200, 200));
     coin = coin_new(gfc_vector2d(1000, 900));
     world = world_load("worlds/testworld.world");
+    brick = brick_new(gfc_vector2d(1050, 900));
+
 
     slog("press [escape] to quit");
 
