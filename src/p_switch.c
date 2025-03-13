@@ -51,6 +51,7 @@ void p_switch_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 
 	bricks = entity_find_by_name("brick_class");
 	if (!bricks) {
+		entity_free(self);
 		return;
 	}
 	c = gfc_list_get_count(bricks);

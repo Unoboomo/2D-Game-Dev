@@ -20,6 +20,7 @@
 #include "platform.h"
 #include "conveyor.h"
 #include "trampoline.h"
+#include "one_way_wall.h"
 
 Uint8 _DRAWBOUNDS = 0;
 
@@ -51,6 +52,7 @@ int main(int argc, char * argv[])
 
     Entity* trampoline;
     Entity* p_switch;
+    Entity* one_way_wall;
 
     char formatted_string[100];
 
@@ -93,6 +95,7 @@ int main(int argc, char * argv[])
     conveyor = conveyor_new(gfc_vector2d(1200, 900));
     trampoline = trampoline_new(gfc_vector2d(1250, 900));
     p_switch = p_switch_new(gfc_vector2d(1350, 900));
+    one_way_wall = one_way_wall_new(gfc_vector2d(1400, 900));
 
     data = (PlayerEntityData*)player->data;
   
