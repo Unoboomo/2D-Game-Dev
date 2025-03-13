@@ -15,6 +15,7 @@ typedef struct Physics_Object_s
 	//Physics!!! YAY!
 	GFC_Vector2D	position;				//the position of the entity in space (the entity is centered on this point)
 	GFC_Vector2D	velocity;				//how fast the entity is moving
+	GFC_Vector2D	w_velocity;				//changes in the speed of the enitity made by the world
 	GFC_Vector2D	acceleration;			//how fast the velocity changes 
 
 	GFC_Vector2D	gravity;
