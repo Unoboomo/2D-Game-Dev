@@ -22,6 +22,7 @@
 #include "platform.h"
 #include "conveyor.h"
 #include "trampoline.h"
+#include "p_switch.h"
 #include "one_way_wall.h"
 
 Uint8 _DRAWBOUNDS = 0;
@@ -43,6 +44,7 @@ int main(int argc, char * argv[])
     Entity* player;
 
     Entity* bug;
+    Entity* bug2;
     Entity* bullet_bill;
 
     Entity* coin;
@@ -87,6 +89,7 @@ int main(int argc, char * argv[])
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new(gfc_vector2d(20, 20));
     bug = bug_new(gfc_vector2d(200, 200));
+    bug2 = bug2_new(gfc_vector2d(300, 200));
     bullet_bill = bullet_bill_new(gfc_vector2d(0, 550));
     platform = platform_new(gfc_vector2d(850, 900));
 

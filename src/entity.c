@@ -260,9 +260,13 @@ void entity_check_world_bounds(Entity* self) {
 	//checks for colisions with the edge of the world and prevents leaving the world (world bounds = camera bounds)
 	if (self->physics->position.x - self->physics->bounds.w / 2 < bounds.x) {
 		self->physics->position.x = bounds.x + self->physics->bounds.w / 2;
+		self->physics->x_world_collision = -1;
+		self->physics->velocity.x = 0;
 	}
 	if (self->physics->position.x + self->physics->bounds.w / 2 > bounds.x + bounds.w) {
 		self->physics->position.x = bounds.x + bounds.w - self->physics->bounds.w / 2;
+		self->physics->x_world_collision = 1;
+		self->physics->velocity.x = 0;
 	}
 	if (self->physics->position.y - self->physics->bounds.h / 2 < bounds.y) {
 		self->physics->position.y = bounds.y + self->physics->bounds.h / 2;
