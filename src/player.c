@@ -226,6 +226,7 @@ void player_think(Entity* self) {
 			self->physics->acceleration.x = self->physics->velocity.x = 0;
 		}
 	}
+
 	self->physics->on_ice = 0;
 }
 

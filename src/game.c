@@ -19,6 +19,7 @@
 #include "question_block.h"
 #include "platform.h"
 #include "conveyor.h"
+#include "trampoline.h"
 
 Uint8 _DRAWBOUNDS = 0;
 
@@ -48,6 +49,8 @@ int main(int argc, char * argv[])
     Entity* platform;
     Entity* conveyor;
 
+    Entity* trampoline;
+
     char formatted_string[100];
 
     PlayerEntityData* data;
@@ -68,7 +71,7 @@ int main(int argc, char * argv[])
     gf2d_graphics_set_frame_delay(16);
     gf2d_sprite_init(1024);
     font_init();
-    entity_system_init(128); 
+    entity_system_init(256); 
     SDL_ShowCursor(SDL_DISABLE);
     camera_set_size(gfc_vector2d(1280, 720));
     
@@ -87,6 +90,8 @@ int main(int argc, char * argv[])
     question_block = question_block_new(gfc_vector2d(1100, 900));
     invisible_question_block = invisible_question_block_new(gfc_vector2d(1150, 900));
     conveyor = conveyor_new(gfc_vector2d(1200, 900));
+    trampoline = trampoline_new(gfc_vector2d(1250, 900));
+
 
     data = (PlayerEntityData*)player->data;
   

@@ -80,10 +80,14 @@ GFC_Vector2D physics_get_test_position(Physics_Object* self) {
 		test_velocity.y = downward_cap;
 	}
 
+	//apply world changes in velocity here
+	gfc_vector2d_add(test_velocity, test_velocity, self->this_w_velocity);
+	
+
 	gfc_vector2d_add(test_position, self->position, test_velocity);
 
-	//apply world changes in velocity here
-	gfc_vector2d_add(test_velocity, test_velocity, self->w_velocity);
+	//apply world changes in position here
+	gfc_vector2d_add(test_position, test_position, self->this_w_position);
 
 	return test_position;
 }
@@ -123,10 +127,13 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 		test_velocity.y = downward_cap;
 	}
 	
+	//apply world changes in velocity here
+	gfc_vector2d_add(test_velocity, test_velocity, self->this_w_velocity);
+
 	gfc_vector2d_add(test_position, self->position, test_velocity);
 
 	//apply world changes in velocity here
-	gfc_vector2d_add(test_position, test_position, self->w_velocity);
+	gfc_vector2d_add(test_position, test_position, self->this_w_position);
 
 	bounds = self->bounds;
 	
@@ -181,7 +188,10 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 	}
 
 	self->x_collided_prev = self->y_collided_prev = 0;
-	gfc_vector2d_clear(self->w_velocity);
+	gfc_vector2d_copy(self->this_w_position, self->next_w_position);
+	gfc_vector2d_clear(self->next_w_position);
+	gfc_vector2d_copy(self->this_w_velocity, self->next_w_velocity);
+	gfc_vector2d_clear(self->next_w_velocity);
 }
 
 Uint8 physics_obj_collision_check(Physics_Object* self, Physics_Object* other) { 

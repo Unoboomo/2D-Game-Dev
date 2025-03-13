@@ -4,27 +4,27 @@
 
 #include "player.h"
 
-#include "conveyor.h"
+#include "trampoline.h"
 
-void conveyor_touch(Entity* self, Entity* other, GFC_Vector2D collision_side);
+void trampoline_touch(Entity* self, Entity* other, GFC_Vector2D collision_side);
 
-Entity* conveyor_new(GFC_Vector2D position) {
+Entity* trampoline_new(GFC_Vector2D position) {
 	Entity* self;
 	self = entity_new();
 	if (!self) {
-		slog("failed to spawn a new conveyor entity");
+		slog("failed to spawn a new trampoline entity");
 		return NULL;
 	}
 	self->physics = physics_obj_new();
 	if (!self->physics) {
-		slog("failed to create a physics object for new conveyor entity");
+		slog("failed to create a physics object for new trampoline entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/conveyor.def");
+	entity_configure_from_file(self, "def/trampoline.def");
 
 	entity_set_collision_layer(self, ECL_World);
 
-	self->touch = conveyor_touch;
+	self->touch = trampoline_touch;
 
 	self->frame = 0;
 	self->physics->gravity = ZEROGRAV;
@@ -33,7 +33,7 @@ Entity* conveyor_new(GFC_Vector2D position) {
 	return self;
 }
 
-void conveyor_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
+void trampoline_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 	if (!self || !other || !other->physics) {
 		return;
 	}
@@ -41,7 +41,8 @@ void conveyor_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 	if (collision_side.y >= 0) {
 		return;
 	}
-	other->physics->next_w_position.x = 1;
+	slog("here");
+	other->physics->next_w_velocity.y = -4;
 }
 
 

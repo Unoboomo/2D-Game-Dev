@@ -1,0 +1,7 @@
+{
+  "name": "trampoline_class",
+  "bounds": [ 0, 0, 45, 45 ],
+  "sprite": "images/trampoline.png",
+  "sprite_size": [ 45, 45],
+  "sprite_fpl": 1
+}
