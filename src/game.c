@@ -50,6 +50,7 @@ int main(int argc, char * argv[])
     Entity* conveyor;
 
     Entity* trampoline;
+    Entity* p_switch;
 
     char formatted_string[100];
 
@@ -91,7 +92,7 @@ int main(int argc, char * argv[])
     invisible_question_block = invisible_question_block_new(gfc_vector2d(1150, 900));
     conveyor = conveyor_new(gfc_vector2d(1200, 900));
     trampoline = trampoline_new(gfc_vector2d(1250, 900));
-
+    p_switch = p_switch_new(gfc_vector2d(1350, 900));
 
     data = (PlayerEntityData*)player->data;
   

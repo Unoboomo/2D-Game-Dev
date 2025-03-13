@@ -1,6 +1,7 @@
 #include "simple_logger.h"
 
 #include "gfc_config.h"
+#include "gfc_list.h"
 
 #include "gf2d_draw.h"
 #include "gf2d_graphics.h"
@@ -367,4 +368,24 @@ void entity_collide_all(Entity* self) {
 			
 		}
 	}
+}
+
+GFC_List* entity_find_by_name(const char* entity_name) {
+	int i;
+	GFC_List* entities = gfc_list_new();
+
+	for (i = 0; i < entity_system.entity_max; i++) { //y change test
+		if (!entity_system.entity_list[i]._inuse) {
+			continue;
+		}
+		if (!strcmp(entity_name, entity_system.entity_list[i].name)) {
+			gfc_list_append(entities, &entity_system.entity_list[i]);
+		}
+	}
+	if (!gfc_list_get_count(entities)) {
+		gfc_list_delete(entities);
+		slog("did not find any entities of the name %s", entity_name);
+		return NULL;
+	}
+	return entities;
 }

@@ -148,4 +148,13 @@ void entity_check_world_bounds(Entity* self);
 * @param *self a pointer to the entity to check with
 */
 void entity_collide_all(Entity* self);
+
+/**
+* @brief gets a list of all entitys with a specific entity_name
+* @param the entity name to look for
+* @return a List of pointers to entities
+* @note the gfc_list returned must be cleaned up with gfc_list_delete
+*/
+GFC_List* entity_find_by_name(const char* entity_name);
+
 #endif
