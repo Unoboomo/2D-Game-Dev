@@ -84,7 +84,7 @@ void bug2_think(Entity* self) {
 			}
 			else {
 				self->physics->velocity.x = -self->physics->horizontal_velocity_cap;
-
+				 
 			}
 		}
 	}
