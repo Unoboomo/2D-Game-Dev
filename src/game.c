@@ -7,11 +7,13 @@
 #include "gf2d_sprite.h"
 
 #include "font.h"
-#include "bug.h"
 #include "camera.h"
 #include "entity.h"
 #include "player.h"
 #include "world.h"
+
+#include "bug.h"
+#include "bullet_bill.h"
 
 #include "coin.h"
 #include "brick.h"
@@ -39,7 +41,10 @@ int main(int argc, char * argv[])
     GFC_Color mouseGFC_Color = gfc_color8(216,2,0,255);
     
     Entity* player;
+
     Entity* bug;
+    Entity* bullet_bill;
+
     Entity* coin;
     Entity* brick;
     Entity* ice1;
@@ -82,6 +87,7 @@ int main(int argc, char * argv[])
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new(gfc_vector2d(20, 20));
     bug = bug_new(gfc_vector2d(200, 200));
+    bullet_bill = bullet_bill_new(gfc_vector2d(0, 550));
     platform = platform_new(gfc_vector2d(850, 900));
 
     coin = coin_new(gfc_vector2d(900, 900));

@@ -1,0 +1,7 @@
+{
+  "name": "bullet_bill_class",
+  "bounds": [ 2, 13, 86, 17 ],
+  "sprite": "images/bullet.png",
+  "sprite_size": [ 90, 45 ],
+  "sprite_fpl": 1
+}
