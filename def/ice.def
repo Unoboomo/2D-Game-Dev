@@ -1,0 +1,7 @@
+{
+  "name": "ice_class",
+  "bounds": [ 0, 0, 45, 45 ],
+  "sprite": "images/ice.png",
+  "sprite_size": [ 45, 45],
+  "sprite_fpl": 1
+}

@@ -15,6 +15,7 @@
 
 #include "coin.h"
 #include "brick.h"
+#include "ice.h"
 #include "question_block.h"
 #include "platform.h"
 #include "conveyor.h"
@@ -39,6 +40,9 @@ int main(int argc, char * argv[])
     Entity* bug;
     Entity* coin;
     Entity* brick;
+    Entity* ice1;
+    Entity* ice2;
+
     Entity* question_block;
     Entity* invisible_question_block;
     Entity* platform;
@@ -72,13 +76,17 @@ int main(int argc, char * argv[])
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new(gfc_vector2d(20, 20));
     bug = bug_new(gfc_vector2d(200, 200));
-    coin = coin_new(gfc_vector2d(1000, 900));
+    platform = platform_new(gfc_vector2d(850, 900));
+
+    coin = coin_new(gfc_vector2d(900, 900));
     world = world_load("worlds/testworld.world");
-    brick = brick_new(gfc_vector2d(1050, 900));
+    brick = brick_new(gfc_vector2d(950, 900));
+    ice1 = ice_new(gfc_vector2d(1000, 900));
+    ice2 = ice_new(gfc_vector2d(1050, 900));
+
     question_block = question_block_new(gfc_vector2d(1100, 900));
     invisible_question_block = invisible_question_block_new(gfc_vector2d(1150, 900));
-    platform = platform_new(gfc_vector2d(1200, 900));
-    conveyor = conveyor_new(gfc_vector2d(1250, 900));
+    conveyor = conveyor_new(gfc_vector2d(1200, 900));
 
     data = (PlayerEntityData*)player->data;
   

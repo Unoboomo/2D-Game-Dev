@@ -171,24 +171,27 @@ void player_think(Entity* self) {
 			}
 		}
 	}
-	
+	if (self->physics->grounded) {
+		acceleration = friction = GROUND_ACCELERATION * (self->physics->on_ice ? ICE_ACCELERATION_MODIFIER : 1);
+		// Running affects acceleration only on the ground
+		acceleration *= (1 + self->physics->running);
+	}
+	else {
+		acceleration = friction = MIDAIR_ACCELERATION;
+	}
+
 	if (gfc_input_command_down("right") != gfc_input_command_down("left")) { // Moving in a single direction
 		move_direction = gfc_input_command_down("right") ? 1 : -1; // 1 for right, -1 for left
 
-		// Running affects acceleration only on the ground
-		acceleration = self->physics->grounded
-			? GROUND_ACCELERATION * (1 + self->physics->running)
-			: MIDAIR_ACCELERATION;
 
 		self->physics->acceleration.x = move_direction * acceleration;
 
 		// Skid stop: Extra acceleration when reversing direction
 		if (self->physics->velocity.x * move_direction < 0) { // If moving in the opposite direction
-			self->physics->acceleration.x += move_direction * (self->physics->grounded ? GROUND_ACCELERATION * (1 + self->physics->running) : MIDAIR_ACCELERATION);
+			self->physics->acceleration.x += move_direction * acceleration;
 		}
 	}
 	else { // No movement input
-		friction = self->physics->grounded ? GROUND_ACCELERATION : MIDAIR_ACCELERATION;
 		self->physics->acceleration.x = -self->physics->velocity.x * friction;
 	}
 
@@ -223,6 +226,7 @@ void player_think(Entity* self) {
 			self->physics->acceleration.x = self->physics->velocity.x = 0;
 		}
 	}
+	self->physics->on_ice = 0;
 }
 
 void player_update(Entity* self) {

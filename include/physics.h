@@ -33,6 +33,7 @@ typedef struct Physics_Object_s
 
 	Uint8			running;				//if 1, doubles the foreward velocity cap
 	Uint8			grounded;				//if the physics object is touching the ground
+	Uint8			on_ice;					//1 if the object is on ice, 0 otherwise
 	int				x_world_collision;		//if the physics object colliding with the world on the x axis, positive for right side, negative for left side
 
 	int				dir_face;				//what direction the entity is facing, right is 1, left is -1
