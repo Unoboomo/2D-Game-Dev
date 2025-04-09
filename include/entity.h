@@ -9,7 +9,7 @@
 
 #include "physics.h"
 
-typedef enum {
+typedef enum { //entities of the same type do not collide with each other
 	ETT_none,
 	ETT_player,
 	ETT_monster,
@@ -18,12 +18,12 @@ typedef enum {
 	ETT_MAX
 }EntityTeamType;
 
-typedef enum {
+typedef enum { 
 	ECL_none = 0,
-	ECL_World = 2,
-	ECL_Entity = 4,
-	ECL_Item = 8,
-	ECL_ALL = 14
+	ECL_World = 1,
+	ECL_Entity = 2,
+	ECL_Item = 4,
+	ECL_ALL = 7
 }EntityCollisionLayers;
 
 typedef struct Entity_s
@@ -41,10 +41,10 @@ typedef struct Entity_s
 
 	Physics_Object			*physics;							//a struct holding all the physics variables for the entity
 
-	void					(*think)(struct Entity_s* self);	//pointer to a think function
-	void					(*update)(struct Entity_s* self);	//pointer to a update function (all entities can think based on the same gamestate, then update all)
+	void					(*think)(struct Entity_s* self);														//pointer to a think function
+	void					(*update)(struct Entity_s* self);														//pointer to a update function (all entities can think based on the same gamestate, then update all)
 	void					(*touch)(struct Entity_s* self, struct Entity_s* other, GFC_Vector2D collision_side);	//pointer to a touch function 
-	void					(*free)(struct Entity_s* self);		//pointer to a free function
+	void					(*free)(struct Entity_s* self);															//pointer to a free function
 
 	void					*data;								//the storage for unique entity type data, eg. (gclient, monsterdata, itemdata, etc.)			
 }Entity;
@@ -114,6 +114,14 @@ void entity_configure(Entity* self, SJson* json);
 * @param *self a pointer to the entity to update the position of
 */
 void entity_update_position(Entity* self);
+
+/**
+* @brief checks if the entity's team matches with another team
+* @param *self a pointer to the entity to check the team of
+* @param team the team to check against
+* @return the matching bitmask (will be 0 if no overlap, a non-zero otherwise)
+*/
+Uint8 entity_check_team(Entity* self, EntityTeamType team);
 
 /**
 * @brief checks the entity layers collide with the other layers

@@ -22,7 +22,7 @@ Entity* platform_new(GFC_Vector2D position) {
 	}
 	entity_configure_from_file(self, "def/platform.def");
 
-	entity_set_collision_layer(self, ECL_Entity);
+	entity_set_collision_layer(self, ECL_ALL);
 
 	self->touch = platform_touch;
 
@@ -37,18 +37,15 @@ void platform_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 	if (!self || !other) {
 		return;
 	}
-	if (!other->player) {
-		return;
-	}
 	if (physics_obj_collision_check(self->physics, other->physics)) {
 		return;
 	}
 	if (collision_side.y >= 0) {
 		return;
 	}
-	other->physics->velocity.y = 0; //whether we bonked (velocity.y < 0) or are grounded (velocity.y > 0), set velocity.y to 0
+	other->physics->velocity.y = 0; //we are grounded (velocity.y > 0), set velocity.y to 0
 	other->physics->grounded = 1;
-	other->physics->y_collided_prev = 1; //let physics_update to not try movement in the y direction
+	other->physics->y_col_this_frame = 1; //let physics_update to not try movement in the y direction
 }
 
 

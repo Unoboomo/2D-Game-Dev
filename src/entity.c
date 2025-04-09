@@ -225,6 +225,12 @@ void entity_update_position(Entity* self) {
 	entity_check_world_bounds(self);
 }
 
+Uint8 entity_check_team(Entity* self, EntityTeamType team) {
+	if (!self) {
+		return ETT_none;
+	}
+	return self->team & team;
+}
 
 Uint8 entity_check_layer(Entity* self, EntityCollisionLayers layer) {
 	if (!self) {
@@ -287,10 +293,12 @@ void entity_collide_all(Entity* self) {
 	if (!self || !self->physics) {
 		return;
 	}
-	self->physics->x_collided_prev = self->physics->y_collided_prev = 0;
-	//get test position of entity
+
+	self->physics->x_col_this_frame = self->physics->y_col_this_frame = 0; //reset frame collisions
+
 	test_position = physics_get_test_position(self->physics);
 
+	//finds the direction the entity wants to move to determine collision sides
 	velocity_dir = gfc_vector2d(test_position.x - self->physics->position.x, test_position.y - self->physics->position.y);
 	
 	//get collision bounds for y direction test
@@ -300,53 +308,70 @@ void entity_collide_all(Entity* self) {
 	gfc_vector2d_sub(bounds, bounds, self->physics->center);
 
 	for (i = 0; i < entity_system.entity_max; i++) { //y change test
-		if (!entity_system.entity_list[i]._inuse|| self == &entity_system.entity_list[i] || entity_system.entity_list[i].player) {
+		if (!entity_system.entity_list[i]._inuse|| self == &entity_system.entity_list[i] || entity_system.entity_list[i].player) { //currently, things dont collide with the player, the player collides with things
 			continue;
 		}
-		if (!entity_check_layer(self, entity_system.entity_list[i].layer)) {
+		if (entity_check_team(self, entity_system.entity_list[i].team)) { //if on the same team, dont collide
+			continue;
+		}
+		if (!entity_check_layer(self, entity_system.entity_list[i].layer)) { //if not on the same layer, dont collide
 			continue;
 		}
 		if (physics_obj_test_collision_rect(entity_system.entity_list[i].physics, bounds)) {
 
-			if (entity_check_layer(&entity_system.entity_list[i], ECL_World)) { //if this, we treat as a world collision
+			if (entity_check_team(&entity_system.entity_list[i], ETT_world)) { //if the other entity is of team world, we treat as a world collision
+
 				self->physics->velocity.y = 0; //whether we bonked (velocity.y < 0) or are grounded (velocity.y > 0), set velocity.y to 0
 
 				if (velocity_dir.y > 0) { //if velocity is positive and a collision happened, we are grounded
 					self->physics->grounded = 1;
 				}
-				else {
+				else { //otherwise, we bonked, but we dont care about bonking
 					self->physics->grounded = 0;
 				}
-				self->physics->y_collided_prev = 1; //let physics_update to not try movement in the y direction
+
+				self->physics->y_col_this_frame = 1; //there was a y collision this frame, so pass the info along to the physics_update function
 			}
-			collision_side = velocity_dir.y > 0 ? gfc_vector2d(0, -1) : gfc_vector2d(0, 1);
-			if (!strcmp(self->name, "player_class")) {
-				//slog("%s is colliding with %s", self->name, entity_system.entity_list[i].name);
+
+			if (velocity_dir.y > 0) { //if self is moving down
+				collision_side = TOP_SIDE; //hit the top side of other entity
 			}
-			
-			if (entity_system.entity_list[i].touch) {
+			else { //if self is moving up
+				collision_side = BOTTOM_SIDE; //hit the bottom side of other entity
+			}
+
+			/*
+			if (!strcmp(self->name, "player_class")) { //if the entity is a player, what is the player colliding with
+				slog("%s is colliding with %s", self->name, entity_system.entity_list[i].name);
+			}
+			*/
+
+			if (entity_system.entity_list[i].touch) { //if the entity has a touch function, call it
 				entity_system.entity_list[i].touch(&entity_system.entity_list[i], self, collision_side);
-			}
-			if (self->physics->y_collided_prev) {
-				test_position.y = self->physics->position.y;
 			}
 		}
 	}
 
 	//get collision bounds for x direction test
-	bounds.y = self->physics->bounds.y + test_position.y; //logic here is wonky if we have a worldlike collision in the y direction
-	bounds.x = self->physics->bounds.x + test_position.x;
+	gfc_rect_copy(bounds, self->physics->bounds);
+	bounds.y = self->physics->y_col_this_frame ? bounds.y + self->physics->position.y : bounds.y + test_position.y;
+	bounds.x = bounds.x + test_position.x;
 	gfc_vector2d_sub(bounds, bounds, self->physics->center);
 
 	for (i = 0; i < entity_system.entity_max; i++) { //x change test
-		if (!entity_system.entity_list[i]._inuse || self == &entity_system.entity_list[i]) {
+		if (!entity_system.entity_list[i]._inuse || self == &entity_system.entity_list[i] || entity_system.entity_list[i].player) { //currently, things dont collide with the player, the player collides with things
 			continue;
 		}
-		if (!entity_check_layer(self, entity_system.entity_list[i].layer)) {
+		if (entity_check_team(self, entity_system.entity_list[i].team)) { //if on the same team, dont collide
+			continue;
+		}
+		if (!entity_check_layer(self, entity_system.entity_list[i].layer)) { //if not on the same layer, dont collide
 			continue;
 		}
 		if (physics_obj_test_collision_rect(entity_system.entity_list[i].physics, bounds)) {
-			if (entity_check_layer(&entity_system.entity_list[i], ECL_World)) { //if this, we treat as a world collision
+
+			if (entity_check_team(&entity_system.entity_list[i], ETT_world)) { //if the other entity is of team world, we treat as a world collision
+
 				self->physics->velocity.x = 0;
 				self->physics->acceleration.x = 0;
 
@@ -357,16 +382,24 @@ void entity_collide_all(Entity* self) {
 					self->physics->x_world_collision = -1;
 				}
 
-				self->physics->x_collided_prev = 1; //let physics_update to not try movement in the x direction
+				self->physics->x_col_this_frame = 1; //let physics_update to not try movement in the x direction
 
 			}
-			collision_side = velocity_dir.x > 0 ? gfc_vector2d(-1, 0) : gfc_vector2d(1,0);
 
-			if (!strcmp(self->name, "player_class")) {
-				//slog("%s is colliding with %s", self->name, entity_system.entity_list[i].name);
+			if (velocity_dir.x > 0) { //if self is moving right
+				collision_side = LEFT_SIDE; //hit the left side of other entity
 			}
+			else { //if self is moving left
+				collision_side = RIGHT_SIDE; //hit the right side of other entity
+			}
+
+			/*
+			if (!strcmp(self->name, "player_class")) { //if the entity is a player, what is the player colliding with
+				slog("%s is colliding with %s", self->name, entity_system.entity_list[i].name);
+			}
+			*/
 			
-			if (entity_system.entity_list[i].touch) {
+			if (entity_system.entity_list[i].touch) { //if the entity has a touch function, call it
 				entity_system.entity_list[i].touch(&entity_system.entity_list[i], self, collision_side);
 			}
 			

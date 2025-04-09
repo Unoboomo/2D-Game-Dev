@@ -22,7 +22,8 @@ Entity* ice_new(GFC_Vector2D position) {
 	}
 	entity_configure_from_file(self, "def/ice.def");
 
-	entity_set_collision_layer(self, ECL_World);
+	entity_set_collision_layer(self, ECL_ALL);
+	self->team = ETT_world;
 
 	self->touch = ice_touch;
 
@@ -42,7 +43,6 @@ void ice_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 	}
 	if (collision_side.y < 0) {
 		other->physics->on_ice = 1;
-		slog("icy");
 	}
 }
 

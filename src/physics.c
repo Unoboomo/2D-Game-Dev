@@ -64,10 +64,17 @@ GFC_Vector2D physics_get_test_position(Physics_Object* self) {
 	if (!self) {
 		return test_position;
 	}
+
 	gfc_vector2d_add(test_velocity, self->velocity, self->acceleration); //add player movement acceleration to velocity
 	gfc_vector2d_add(test_velocity, test_velocity, self->gravity); //apply gravity
 
-	horizontal_cap = self->override_horizontal_velocity_cap ? self->override_horizontal_velocity_cap : self->horizontal_velocity_cap * (1 + self->running);
+	if (self->override_horizontal_velocity_cap) { //if we want to override the normal horizontal velocity cap, do it
+		horizontal_cap = self->override_horizontal_velocity_cap;
+	}
+	else {
+		horizontal_cap = self->horizontal_velocity_cap * (1 + self->running);
+	}
+
 	if (test_velocity.x > horizontal_cap) {
 		test_velocity.x -= self->horizontal_deceleration;
 	}
@@ -75,19 +82,24 @@ GFC_Vector2D physics_get_test_position(Physics_Object* self) {
 		test_velocity.x += self->horizontal_deceleration;
 	}
 
-	downward_cap = self->override_downward_velocity_cap ? self->override_downward_velocity_cap : self->downward_velocity_cap;
+	if (self->override_downward_velocity_cap) { //if we want to override the normal downward velocity cap, do it
+		downward_cap = self->override_downward_velocity_cap;
+	}
+	else {
+		downward_cap = self->downward_velocity_cap;
+	}
+
 	if (test_velocity.y > downward_cap) {
 		test_velocity.y = downward_cap;
 	}
 
 	//apply world changes in velocity here
-	gfc_vector2d_add(test_velocity, test_velocity, self->this_w_velocity);
+	gfc_vector2d_add(test_velocity, test_velocity, self->curr_frame_world_vel);
 	
-
 	gfc_vector2d_add(test_position, self->position, test_velocity);
 
 	//apply world changes in position here
-	gfc_vector2d_add(test_position, test_position, self->this_w_position);
+	gfc_vector2d_add(test_position, test_position, self->curr_frame_world_pos);
 
 	return test_position;
 }
@@ -110,11 +122,16 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 
 
 	gfc_vector2d_add(test_velocity, self->velocity, self->acceleration); //add player movement acceleration to velocity
-
 	gfc_vector2d_add(test_velocity, test_velocity, self->gravity); //apply gravity
 	
 
-	horizontal_cap = self->override_horizontal_velocity_cap ? self->override_horizontal_velocity_cap : self->horizontal_velocity_cap * (1 + self->running);
+	if (self->override_horizontal_velocity_cap) { //if we want to override the normal horizontal velocity cap, do it
+		horizontal_cap = self->override_horizontal_velocity_cap;
+	}
+	else {
+		horizontal_cap = self->horizontal_velocity_cap * (1 + self->running);
+	}
+
 	if (test_velocity.x > horizontal_cap) {
 		test_velocity.x -= self->horizontal_deceleration;
 	}
@@ -122,28 +139,33 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 		test_velocity.x += self->horizontal_deceleration;
 	}
 
-	downward_cap = self->override_downward_velocity_cap ? self->override_downward_velocity_cap : self->downward_velocity_cap;
+	if (self->override_downward_velocity_cap) { //if we want to override the normal downward velocity cap, do it
+		downward_cap = self->override_downward_velocity_cap;
+	}
+	else {
+		downward_cap = self->downward_velocity_cap;
+	}
+
 	if (test_velocity.y > downward_cap) {
 		test_velocity.y = downward_cap;
 	}
 	
 	//apply world changes in velocity here
-	gfc_vector2d_add(test_velocity, test_velocity, self->this_w_velocity);
+	gfc_vector2d_add(test_velocity, test_velocity, self->curr_frame_world_vel);
 
 	gfc_vector2d_add(test_position, self->position, test_velocity);
 
 	//apply world changes in velocity here
-	gfc_vector2d_add(test_position, test_position, self->this_w_position);
+	gfc_vector2d_add(test_position, test_position, self->curr_frame_world_pos);
 
 	bounds = self->bounds;
 	
 	//test move in y direction first, then check if collision
-	gfc_rect_copy(bounds, self->bounds);
-	bounds.y = bounds.y + test_position.y;
-	bounds.x = bounds.x + self->position.x;
+	bounds.y = self->bounds.y + test_position.y;
+	bounds.x = self->bounds.x + self->position.x;
 	gfc_vector2d_sub(bounds, bounds, self->center);
 
-	if (!self->y_collided_prev) {
+	if (!self->y_col_this_frame) { // if there already was a y collision this frame (in entity_collide_all), dont collide
 		if (!world_test_collision_rect(world_get_active(), bounds)) { //no y direction collision
 			//apply physics in the y direction:
 			self->velocity.y = test_velocity.y;
@@ -167,7 +189,7 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 	bounds.x = self->bounds.x + test_position.x;
 	gfc_vector2d_sub(bounds, bounds, self->center);
 
-	if (!self->x_collided_prev) {
+	if (!self->x_col_this_frame) {// if there already was a x collision this frame (in entity_collide_all), dont collide
 		if (!world_test_collision_rect(world_get_active(), bounds)) { //no x direction collision
 			self->velocity.x = test_velocity.x;
 			self->position.x = test_position.x;
@@ -187,11 +209,12 @@ void physics_update(Physics_Object* self) { //check if collision happens after a
 		}
 	}
 
-	self->x_collided_prev = self->y_collided_prev = 0;
-	gfc_vector2d_copy(self->this_w_position, self->next_w_position);
-	gfc_vector2d_clear(self->next_w_position);
-	gfc_vector2d_copy(self->this_w_velocity, self->next_w_velocity);
-	gfc_vector2d_clear(self->next_w_velocity);
+	//for any changes made by the world in position or velocity, 
+	gfc_vector2d_copy(self->curr_frame_world_pos, self->next_frame_world_pos);
+	gfc_vector2d_clear(self->next_frame_world_pos);
+	gfc_vector2d_copy(self->curr_frame_world_vel, self->next_frame_world_vel);
+	gfc_vector2d_clear(self->next_frame_world_vel);
+	self->x_col_this_frame = self->y_col_this_frame = 0;
 }
 
 Uint8 physics_obj_collision_check(Physics_Object* self, Physics_Object* other) { 

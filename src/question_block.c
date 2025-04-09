@@ -22,7 +22,8 @@ Entity* question_block_new(GFC_Vector2D position) {
 	}
 	entity_configure_from_file(self, "def/question_block.def");
 
-	entity_set_collision_layer(self, ECL_World);
+	entity_set_collision_layer(self, ECL_ALL);
+	self->team = ETT_world;
 
 	self->touch = question_block_touch;
 
@@ -47,7 +48,8 @@ Entity* invisible_question_block_new(GFC_Vector2D position) {
 	}
 	entity_configure_from_file(self, "def/invisible_question_block.def");
 
-	entity_set_collision_layer(self, ECL_Entity);
+	entity_set_collision_layer(self, ECL_ALL);
+	self->team = ETT_world;
 
 	self->touch = question_block_touch;
 
@@ -72,7 +74,8 @@ Entity* empty_question_block_new(GFC_Vector2D position) {
 	}
 	entity_configure_from_file(self, "def/empty_question_block.def");
 
-	entity_set_collision_layer(self, ECL_World);
+	entity_set_collision_layer(self, ECL_ALL);
+	self->team = ETT_world;
 
 	self->frame = 0;
 	self->physics->gravity = ZEROGRAV;
@@ -101,7 +104,7 @@ void question_block_touch(Entity* self, Entity* other, GFC_Vector2D collision_si
 	//quick getaround for clipping
 	other->physics->velocity.y = 0; //whether we bonked (velocity.y < 0) or are grounded (velocity.y > 0), set velocity.y to 0
 
-	other->physics->y_collided_prev = 1; //let physics_update to not try movement in the y direction
+	other->physics->y_col_this_frame = 1; //let physics_update to not try movement in the y direction
 }
 
 

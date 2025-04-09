@@ -9,17 +9,22 @@
 #define ZEROGRAV ((GFC_Vector2D) {(float) 0, (float) 0})
 #define JUMPGRAV ((GFC_Vector2D) {(float) 0, (float) 0.2})
 
+#define TOP_SIDE	((GFC_Vector2D) {(float) 0, (float) -1})
+#define BOTTOM_SIDE ((GFC_Vector2D) {(float) 0, (float) 1})
+#define RIGHT_SIDE	((GFC_Vector2D) {(float) 1, (float) 0})
+#define LEFT_SIDE	((GFC_Vector2D) {(float) -1, (float) 0})
 
 typedef struct Physics_Object_s
 {
 	//Physics!!! YAY!
 	GFC_Vector2D	position;				//the position of the entity in space (the entity is centered on this point)
 	GFC_Vector2D	velocity;				//how fast the entity is moving
-	GFC_Vector2D	next_w_position;		//next changes in the position of the enitity made by the world
-	GFC_Vector2D	this_w_position;		//current changes in the position of the enitity made by the world
 
-	GFC_Vector2D	next_w_velocity;		//next changes in the position of the enitity made by the world
-	GFC_Vector2D	this_w_velocity;		//current changes in the position of the enitity made by the world
+	GFC_Vector2D	next_frame_world_pos;		//next changes in the position of the enitity made by the world
+	GFC_Vector2D	curr_frame_world_pos;		//current changes in the position of the enitity made by the world
+
+	GFC_Vector2D	next_frame_world_vel;	//next changes in the velocity of the enitity made by the world
+	GFC_Vector2D	curr_frame_world_vel;	//current changes in the velocity of the enitity made by the world
 
 	GFC_Vector2D	acceleration;			//how fast the velocity changes 
 
@@ -33,8 +38,8 @@ typedef struct Physics_Object_s
 	float			downward_velocity_cap;	//the max speed an entity can move vertically
 	float			override_downward_velocity_cap;	//override downward velocity cap with this value
 
-	Uint8			y_collided_prev;		//if this physics object has collided with something in the y dir this frame
-	Uint8			x_collided_prev;		//if this physics object has collided with something in the x dir this frame
+	Uint8			y_col_this_frame;		//if this physics object has collided with something in the y dir this frame
+	Uint8			x_col_this_frame;		//if this physics object has collided with something in the x dir this frame
 
 	Uint8			running;				//if 1, doubles the foreward velocity cap
 	Uint8			grounded;				//if the physics object is touching the ground

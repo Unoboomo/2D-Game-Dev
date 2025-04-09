@@ -40,7 +40,12 @@ void gf2d_sprite_init(Uint32 max)
     }
     sprite_manager.max_sprites = max;
     sprite_manager.sprite_list = (Sprite *)malloc(sizeof(Sprite)*max);
-    memset (sprite_manager.sprite_list,0,sizeof(Sprite)*max);
+    if (!sprite_manager.sprite_list)
+    {
+        slog("failed to allocate sprite list");
+        return;
+    }
+    memset(sprite_manager.sprite_list,0,sizeof(Sprite)*max);
     if (!(IMG_Init( IMG_INIT_PNG) & IMG_INIT_PNG))
     {
         slog("failed to init image: %s",SDL_GetError());

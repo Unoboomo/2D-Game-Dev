@@ -22,7 +22,7 @@ Entity* one_way_wall_new(GFC_Vector2D position) {
 	}
 	entity_configure_from_file(self, "def/one_way_wall.def");
 
-	entity_set_collision_layer(self, ECL_Entity);
+	entity_set_collision_layer(self, ECL_ALL);
 
 	self->touch = one_way_wall_touch;
 
@@ -37,9 +37,6 @@ void one_way_wall_touch(Entity* self, Entity* other, GFC_Vector2D collision_side
 	if (!self || !other) {
 		return;
 	}
-	if (!other->player) {
-		return;
-	}
 	if (physics_obj_collision_check(self->physics, other->physics)) {
 		return;
 	}
@@ -47,7 +44,7 @@ void one_way_wall_touch(Entity* self, Entity* other, GFC_Vector2D collision_side
 		return;
 	}
 	other->physics->velocity.x = 0; 
-	other->physics->x_collided_prev = 1; 
+	other->physics->x_col_this_frame = 1;
 	other->physics->x_world_collision = -1;
 
 }

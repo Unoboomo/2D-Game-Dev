@@ -22,7 +22,8 @@ Entity* brick_new(GFC_Vector2D position) {
 	}
 	entity_configure_from_file(self, "def/brick.def");
 
-	entity_set_collision_layer(self, ECL_World);
+	entity_set_collision_layer(self, ECL_ALL);
+	self->team = ETT_world;
 
 	self->touch = brick_touch;
 	
