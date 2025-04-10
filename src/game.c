@@ -6,9 +6,10 @@
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
 
-#include "font.h"
 #include "camera.h"
 #include "entity.h"
+#include "font.h"
+#include "particle.h"
 #include "player.h"
 #include "world.h"
 
@@ -36,6 +37,7 @@ int main(int argc, char * argv[])
     const Uint8 * keys;
     World* world;
 
+    Uint32 ms;
     int mx,my;
     float mf = 0;
     Sprite *mouse;
@@ -80,6 +82,7 @@ int main(int argc, char * argv[])
     gfc_input_init("config/input.cfg");
     gf2d_graphics_set_frame_delay(16);
     gf2d_sprite_init(1024);
+    particle_system_init(10000);
     font_init();
     entity_system_init(256); 
     SDL_ShowCursor(SDL_DISABLE);
@@ -117,12 +120,15 @@ int main(int argc, char * argv[])
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         font_cleanup();
         /*update things here*/
-        SDL_GetMouseState(&mx,&my);
+        ms = SDL_GetMouseState(&mx,&my);
         mf+=0.1;
         if (mf >= 16.0)mf = 0;
         
-        entity_system_think_all();
-        entity_system_update_all();
+        if (ms & SDL_BUTTON_X2MASK) {
+            particles_from_file("def/particles/blood_splatter.part", 10, gfc_vector2d(mx,my), gfc_vector2d(1,-1), JUMPGRAV);
+        }
+            entity_system_think_all();
+            entity_system_update_all();
 
         sprintf(formatted_string, "Coins: %d\nLives: %d", data->coin_count, data->lives_count);
 
@@ -135,6 +141,8 @@ int main(int argc, char * argv[])
             entity_system_draw_all();
 
             font_draw_test(formatted_string, FS_medium, GFC_COLOR_WHITE, gfc_vector2d(10, 10));
+
+            particle_system_draw();
 
             //UI elements last
             gf2d_sprite_draw(
