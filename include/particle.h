@@ -71,13 +71,13 @@ void particle_free(Particle* particle);
 
 /**
 * @brief configure particles based on provided filename that contains a config
-* @param filename the filename that contains the config
+* @param name the name of the particle to create
 * @param count how many particles to create
 * @param position where to create the particles
 * @param direction what direction the particles will travel in
 * @param acceleration what the acceleration of the particle will be
 */
-void particles_from_file(const char* filename, Uint32 count, GFC_Vector2D position, GFC_Vector2D direction, GFC_Vector2D acceleration);
+void particles_from_def(const char* name, Uint32 count, GFC_Vector2D position, GFC_Vector2D direction, GFC_Vector2D acceleration);
 
 /**
 * @brief configure an particle based on provided json config

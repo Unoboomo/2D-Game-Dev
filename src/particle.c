@@ -1,6 +1,7 @@
 #include "simple_logger.h"
 
 #include "gfc_config.h"
+#include "gfc_config_def.h"
 #include "gf2d_draw.h"
 
 #include "particle.h"
@@ -142,17 +143,17 @@ void particle_free(Particle* particle) {
 	}
 }
 
-void particles_from_file(const char* filename, Uint32 count, GFC_Vector2D position, GFC_Vector2D direction, GFC_Vector2D acceleration) {
+void particles_from_def(const char* name, Uint32 count, GFC_Vector2D position, GFC_Vector2D direction, GFC_Vector2D acceleration) {
 	int i;
-	SJson* json;
-	json = sj_load(filename);
+	SJson *json;
+	json = gfc_config_def_get_by_name("particles", name);
+
 	if (!json) {
 		return;
 	}
 	for (i = 0; i < count; i++) {
 		particle_from_json(json,position,direction,acceleration);
 	}
-	sj_free(json);
 }
 
 Particle* particle_from_json(SJson* json, GFC_Vector2D position, GFC_Vector2D direction, GFC_Vector2D acceleration) {

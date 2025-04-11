@@ -2,6 +2,7 @@
 #include "simple_logger.h"
 
 #include "gfc_input.h"
+#include "gfc_config_def.h"
 
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
@@ -84,10 +85,14 @@ int main(int argc, char * argv[])
     gf2d_sprite_init(1024);
     particle_system_init(10000);
     font_init();
+    gfc_config_def_init();
     entity_system_init(256); 
     SDL_ShowCursor(SDL_DISABLE);
     camera_set_size(gfc_vector2d(1280, 720));
     
+    /*load resource files*/
+    gfc_config_def_load("def/particles.def");
+
     /*demo setup*/
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     player = player_new(gfc_vector2d(20, 20));
@@ -125,7 +130,7 @@ int main(int argc, char * argv[])
         if (mf >= 16.0)mf = 0;
         
         if (ms & SDL_BUTTON_X2MASK) {
-            particles_from_file("def/particles/eruption.part", 100, gfc_vector2d(mx,my), gfc_vector2d(0,-1), gfc_vector2d(0,0.1));
+            particles_from_def("eruption", 100, gfc_vector2d(mx, my), gfc_vector2d(0, -1), gfc_vector2d(0, 0.1));
         }
             entity_system_think_all();
             entity_system_update_all();
@@ -162,7 +167,7 @@ int main(int argc, char * argv[])
         gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
         
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
-        slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
+        //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
     entity_system_free_all();
     world_free(world);
