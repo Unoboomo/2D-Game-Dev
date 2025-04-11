@@ -224,7 +224,7 @@ Particle* particle_from_json(SJson* json, GFC_Vector2D position, GFC_Vector2D di
 		color_variance.a *= gfc_crandom();
 		gfc_color_add(&p->color, p->color, color_variance);
 	}
-	gfc_color_clamp(p->color);
+	p->color = gfc_color_clamp(p->color);
 
 	if (p->p_type == PT_Shape) {
 		sj_object_get_int(json, "shape_type", &shape_type);

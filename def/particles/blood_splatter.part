@@ -18,14 +18,14 @@
 
   "this is a comment  ": "int representing shape type: 0=ST_RECT, 1=ST_CIRCLE, 2=ST_EDGE",
   "shape_type": 1,
-  "shape": [ 0, 0, 10 ], 
+  "shape": [ 0, 0, 10 ],
 
   "sprite": "images/brick.png",
   "sprite_size": [ 45, 45 ],
   "sprite_fpl": 1,
 
   "frame_rate": 0,
-  "frame_start": 0, 
-  "frame_end": 0, 
-  "loops": 0 
+  "frame_start": 0,
+  "frame_end": 0,
+  "loops": 0
 }

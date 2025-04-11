@@ -1,0 +1,27 @@
+{
+  "name": "eruption",
+
+  "this is a comment": "int representing particle type: 0=PT_Point,\t1=PT_Shape,\t2=PT_Sprite",
+  "particle_type": 2,
+
+  "ttl": 80,
+  "ttl_variance": 20,
+
+  "angle_variance": 20,
+  "speed": 4,
+  "speed_variance": 0.2,
+
+  "this is a comment ": "all colors in rgba 0-255",
+  "color": [ 229, 70, 13, 204 ],
+  "color_velocity": [ 0, 0, 0, 0 ],
+  "color_variance": [ 26, 70, 13, 0 ],
+
+  "sprite": "images/cloud.png",
+  "sprite_size": [ 16, 16 ],
+  "sprite_fpl": 1,
+
+  "frame_rate": 0,
+  "frame_start": 0,
+  "frame_end": 0,
+  "loops": 0
+}

@@ -125,7 +125,7 @@ int main(int argc, char * argv[])
         if (mf >= 16.0)mf = 0;
         
         if (ms & SDL_BUTTON_X2MASK) {
-            particles_from_file("def/particles/blood_splatter.part", 10, gfc_vector2d(mx,my), gfc_vector2d(1,-1), JUMPGRAV);
+            particles_from_file("def/particles/eruption.part", 100, gfc_vector2d(mx,my), gfc_vector2d(0,-1), gfc_vector2d(0,0.1));
         }
             entity_system_think_all();
             entity_system_update_all();
@@ -135,14 +135,18 @@ int main(int argc, char * argv[])
         gf2d_graphics_clear_screen();// clears drawing buffers
         // all drawing should happen betweem clear_screen and next_frame
             //backgrounds drawn first
-            world_draw(world);
+
+            world_draw_background(world);
+
+            particle_system_draw();
+
+            world_draw_tile_layer(world);
 
             //draw entities next
             entity_system_draw_all();
 
             font_draw_test(formatted_string, FS_medium, GFC_COLOR_WHITE, gfc_vector2d(10, 10));
 
-            particle_system_draw();
 
             //UI elements last
             gf2d_sprite_draw(
@@ -158,7 +162,7 @@ int main(int argc, char * argv[])
         gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
         
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
-        //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
+        slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
     entity_system_free_all();
     world_free(world);

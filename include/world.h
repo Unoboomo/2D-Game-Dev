@@ -63,10 +63,16 @@ void world_free(World* world);
 Uint8 world_get_tile_at(World* world, GFC_Vector2D position);
 
 /**
-* @brief draws an world to the screen
+* @brief draws an world background to the screen
 * @param *self a pointer to the world to draw
 */
-void world_draw(World* world);
+void world_draw_background(World* world);
+
+/**
+* @brief draws an world tile layer to the screen
+* @param *self a pointer to the world to draw
+*/
+void world_draw_tile_layer(World* world);
 
 /**
 * @brief set the camera bounds to the world size

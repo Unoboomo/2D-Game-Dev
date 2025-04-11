@@ -279,10 +279,7 @@ Uint8 world_get_tile_at(World* world, GFC_Vector2D position) {
 	return world->tile_map[(Uint32)position.y * (Uint32)world->tile_width + (Uint32)position.x];
 }
 
-void world_draw(World* world) {
-	GFC_Vector2D offset;
-	int i, j;
-	int index;
+void world_draw_background(World* world) {
 	if (!world) {
 		slog("cannot draw a world that doesn't exist");
 		return;
@@ -290,13 +287,24 @@ void world_draw(World* world) {
 	if (!world->background) {
 		slog("cannot draw a world with no background");
 	}
+	gf2d_sprite_draw_image(world->background, gfc_vector2d(0, 0));
+
+}
+
+void world_draw_tile_layer(World* world) {
+	GFC_Vector2D offset;
+	int i, j;
+	int index;
+	if (!world) {
+		slog("cannot draw a world that doesn't exist");
+		return;
+	}
 	if (!world->tile_layer) {
 		slog("cannot draw a world with no tile_layer");
 	}
 
 	offset = camera_get_offset();
 
-	gf2d_sprite_draw_image(world->background, gfc_vector2d(0, 0));
 	gf2d_sprite_draw_image(world->tile_layer, offset);
 
 	if (_DRAWBOUNDS) {
