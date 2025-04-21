@@ -169,6 +169,7 @@ int main(int argc, char * argv[])
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
+    world_save(world, "worlds/world_save.world");
     entity_system_free_all();
     world_free(world);
     slog("---==== END ====---");

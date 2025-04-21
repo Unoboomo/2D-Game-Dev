@@ -78,6 +78,96 @@ void world_tile_layer_build(World* world) {
 	}
 }
 
+SJson* world_tile_map_save(World* world) {
+	SJson* json;
+	SJson* tile_map_row;
+	int i, j;
+	int index;
+	int k;
+
+	if (!world || !world->tile_map) {
+		slog("cannot save a tilemap that does not exist");
+		return NULL;
+	}
+
+	json = sj_array_new();
+
+	if (!json) {
+		slog("failed to create an array for tilemap");
+		return NULL;
+	}
+
+	tile_map_row = sj_array_new();
+
+	if (!tile_map_row) {
+		slog("failed to create new tile_map_row object");
+		sj_free(json);
+		return NULL;
+	}
+
+	for (i = 0; i < world->tile_height; i++) {
+		for (j = 0; j < world->tile_width; j++) {
+			index = j + (i * world->tile_width);
+			sj_array_append(tile_map_row, sj_new_uint8(world->tile_map[index]));
+		}
+		
+		sj_array_append(json, sj_copy(tile_map_row));
+		
+		for (k = sj_array_count(tile_map_row) - 1; k >= 0 ; k--) {
+			sj_array_delete_nth(tile_map_row, k);
+		}
+	}
+
+	sj_free(tile_map_row);
+	return json;
+}
+
+void world_save(World* world, const char *filename) {
+	SJson* json;
+	SJson* world_json;
+	SJson* tile_map_json;
+	if (!filename || !world) {
+		return;
+	}
+
+	json = sj_object_new();
+
+	if (!json) {
+		slog("failed to create new json object");
+		return;
+	}
+
+	world_json = sj_object_new();
+
+	if (!world_json) {
+		slog("failed to create new world_json object");
+		sj_free(json);
+		return;
+	}
+
+	if (world->background) {
+		sj_object_insert(world_json, "background", sj_new_str(world->background->filepath));
+	}
+	if (world->tileset) {
+		sj_object_insert(world_json, "tileset", sj_new_str(world->tileset->filepath));
+		sj_object_insert(world_json, "frame_w", sj_new_int(world->tileset->frame_w));
+		sj_object_insert(world_json, "frame_h", sj_new_int(world->tileset->frame_h));
+		sj_object_insert(world_json, "frames_per_line", sj_new_int(world->tileset->frames_per_line));
+		tile_map_json = world_tile_map_save(world);
+		if (!tile_map_json) {
+			slog("failed to save tile map to json");
+			sj_free(json);
+			sj_free(world_json);
+			return;
+		}
+		sj_object_insert(world_json, "tile_map", tile_map_json);
+	}
+
+	sj_object_insert(json, "world", world_json);
+	sj_save(json, filename);
+	sj_free(json);
+}
+
 World* world_load(const char* filename) {
 	World* world = NULL;
 	SJson* json = NULL;

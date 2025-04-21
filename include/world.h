@@ -22,6 +22,13 @@ typedef struct
 void world_tile_layer_build(World* world);
 
 /**
+* @breif saves world to a config file
+* @param a pointer to the world to save
+* @param filename the name of the world file to save to
+*/
+void world_save(World* world, const char *filename);
+
+/**
 * @breif loading world from a config file
 * @param filename the name of the world file to load
 * @return NULL on error, a usable world otherwise
