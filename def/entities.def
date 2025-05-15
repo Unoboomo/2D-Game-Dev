@@ -1,0 +1,102 @@
+{
+  "entities": [
+    {
+      "name": "brick",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/brick.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "bug",
+      "bounds": [ 27, 27, 96, 61 ],
+      "sprite": "images/space_bug.png",
+      "sprite_size": [ 128, 128 ],
+      "sprite_fpl": 16
+    },
+    {
+      "name": "bullet_bill",
+      "bounds": [ 2, 13, 86, 17 ],
+      "sprite": "images/bullet.png",
+      "sprite_size": [ 90, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "coin",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/coin.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "conveyor",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/conveyor.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "empty_question_block",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/empty_question_block.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "ice",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/ice.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "invisible_question_block",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/invisible_question_block.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "one_way_wall",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/one_way_wall.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "p_switch",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/p_switch.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "platform",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/platform.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "player",
+      "bounds": [ 25, 34, 81, 55 ],
+      "sprite": "images/ed210.png",
+      "sprite_size": [ 128, 128 ],
+      "sprite_fpl": 16
+    },
+    {
+      "name": "question_block",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/question_block.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    },
+    {
+      "name": "trampoline",
+      "bounds": [ 0, 0, 45, 45 ],
+      "sprite": "images/trampoline.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1
+    }
+  ]
+}
