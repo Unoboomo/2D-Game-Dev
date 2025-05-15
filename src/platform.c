@@ -20,7 +20,7 @@ Entity* platform_new(GFC_Vector2D position) {
 		slog("failed to create a physics object for new platform entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/platform.def");
+	entity_configure_from_def(self, "platform");
 
 	entity_set_collision_layer(self, ECL_ALL);
 

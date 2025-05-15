@@ -1,6 +1,7 @@
 #include "simple_logger.h"
 
 #include "gfc_config.h"
+#include "gfc_config_def.h"
 #include "gfc_list.h"
 
 #include "gf2d_draw.h"
@@ -170,6 +171,22 @@ void entity_draw(Entity* self) {
 	}
 }
 
+void entity_configure_from_def(Entity* self, const char* name) {
+	SJson* json;
+
+	if (!self || !name) {
+		slog("cannot configure entity that does not exist or has no name");
+	}
+	json = gfc_config_def_get_by_name("entities", name); //may need to change the first parameter based on where entities end up, add new parameter to the function?
+
+	if (!json) {
+		slog("json for %s does not exist",name);
+		return;
+	}
+
+	entity_configure_from_json(self, json);
+}
+
 void entity_configure_from_file(Entity* self, const char* filename) {
 	SJson* json;
 	if (!self) {
@@ -180,11 +197,11 @@ void entity_configure_from_file(Entity* self, const char* filename) {
 		slog("json file does not exist");
 		return;
 	}
-	entity_configure(self, json);
+	entity_configure_from_json(self, json);
 	sj_free(json);
 }
 
-void entity_configure(Entity* self, SJson* json)
+void entity_configure_from_json(Entity* self, SJson* json)
 {
 	GFC_Vector2D frame_size = { 0 };
 	Uint32 frames_per_line = 0;

@@ -20,7 +20,7 @@ Entity* trampoline_new(GFC_Vector2D position) {
 		slog("failed to create a physics object for new trampoline entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/trampoline.def");
+	entity_configure_from_def(self, "trampoline");
 
 	entity_set_collision_layer(self, ECL_ALL);
 	self->team = ETT_world;

@@ -92,6 +92,7 @@ int main(int argc, char * argv[])
     
     /*load resource files*/
     gfc_config_def_load("def/particles.def");
+    gfc_config_def_load("def/entities.def");
 
     /*demo setup*/
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);

@@ -27,7 +27,7 @@ Entity* player_new(GFC_Vector2D position) {
 		slog("failed to create a physics object for new player entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/player.def");
+	entity_configure_from_def(self, "player");
 	self->frame = 0;
 
 	gfc_vector2d_copy(self->physics->position, position);

@@ -96,6 +96,13 @@ Entity* entity_new();
 void entity_free(Entity* self);
 
 /**
+* @brief configure an entity based on provided name in a config def
+* @param self the entity to config
+* @param name the name of the entity
+*/
+void entity_configure_from_def(Entity* self, const char* name);
+
+/**
 * @brief configure an entity based on provided filename that contains a config
 * @param self the entity to config
 * @param filename the filename of the json providing entity information
@@ -107,7 +114,7 @@ void entity_configure_from_file(Entity* self, const char* filename);
 * @param self the entity to config
 * @param json the json providing entity information
 */
-void entity_configure(Entity* self, SJson* json);
+void entity_configure_from_json(Entity* self, SJson* json);
 
 /**
 * @brief updates the position of an entity from its velocity and ensures it is still in the window

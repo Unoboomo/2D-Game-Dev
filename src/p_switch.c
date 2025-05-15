@@ -21,7 +21,7 @@ Entity* p_switch_new(GFC_Vector2D position) {
 		slog("failed to create a physics object for new p_switch entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/p_switch.def");
+	entity_configure_from_def(self, "p_switch");
 
 	entity_set_collision_layer(self, ECL_Item);
 
@@ -49,7 +49,7 @@ void p_switch_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 		return;
 	}
 
-	bricks = entity_find_by_name("brick_class");
+	bricks = entity_find_by_name("brick");
 	if (!bricks) {
 		entity_free(self);
 		return;

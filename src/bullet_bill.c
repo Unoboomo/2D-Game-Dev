@@ -20,7 +20,7 @@ Entity* bullet_bill_new(GFC_Vector2D position) {
 		slog("failed to create a physics object for new bullet_bill entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/bullet.def");
+	entity_configure_from_def(self, "bullet_bill");
 
 	entity_set_collision_layer(self, ECL_Entity);
 

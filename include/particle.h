@@ -1,8 +1,6 @@
 #ifndef __PARTICLE_H__
 #define __PARTICLE_H__
 
-#include "simple_json.h"
-
 #include "gfc_color.h"
 #include "gfc_shape.h"
 #include "gfc_text.h"
@@ -70,7 +68,7 @@ Particle* particle_new();
 void particle_free(Particle* particle);
 
 /**
-* @brief configure particles based on provided filename that contains a config
+* @brief configure particles based on provided name in a config def
 * @param name the name of the particle to create
 * @param count how many particles to create
 * @param position where to create the particles

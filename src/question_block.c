@@ -20,7 +20,7 @@ Entity* question_block_new(GFC_Vector2D position) {
 		slog("failed to create a physics object for new question_block entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/question_block.def");
+	entity_configure_from_def(self, "question_block");
 
 	entity_set_collision_layer(self, ECL_ALL);
 	self->team = ETT_world;
@@ -46,7 +46,7 @@ Entity* invisible_question_block_new(GFC_Vector2D position) {
 		slog("failed to create a physics object for new question_block entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/invisible_question_block.def");
+	entity_configure_from_def(self, "invisible_question_block");
 
 	entity_set_collision_layer(self, ECL_ALL);
 	self->team = ETT_world;
@@ -72,7 +72,7 @@ Entity* empty_question_block_new(GFC_Vector2D position) {
 		slog("failed to create a physics object for new question_block entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/empty_question_block.def");
+	entity_configure_from_def(self, "empty_question_block");
 
 	entity_set_collision_layer(self, ECL_ALL);
 	self->team = ETT_world;

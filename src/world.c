@@ -166,7 +166,7 @@ void world_save(World* world, const char *filename) {
 	sj_object_insert(json, "world", world_json);
 	sj_save(json, filename);
 	sj_free(json);
-}
+}	
 
 World* world_load(const char* filename) {
 	World* world = NULL;

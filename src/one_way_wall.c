@@ -20,7 +20,7 @@ Entity* one_way_wall_new(GFC_Vector2D position) {
 		slog("failed to create a physics object for new one_way_wall entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/one_way_wall.def");
+	entity_configure_from_def(self, "one_way_wall");
 
 	entity_set_collision_layer(self, ECL_ALL);
 

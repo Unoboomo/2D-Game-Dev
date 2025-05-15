@@ -20,7 +20,7 @@ Entity* coin_new(GFC_Vector2D position) {
 		slog("failed to create a physics object for new coin entity");
 		return NULL;
 	}
-	entity_configure_from_file(self, "def/coin.def");
+	entity_configure_from_def(self, "coin");
 
 	entity_set_collision_layer(self, ECL_Item);
 
