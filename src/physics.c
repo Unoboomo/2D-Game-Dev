@@ -34,7 +34,7 @@ void physics_obj_configure(Physics_Object* self, SJson* json) {
 	sj_object_get_vector4d(json, "bounds", &bounds);
 	self->bounds = gfc_rect_from_vector4(bounds);
 
-	self->center = gfc_vector2d(bounds.x + (bounds.z / 2), bounds.y + (bounds.w / 2)); //the center of a rectangle is the point (x+w/2,y+h/2)
+	self->center = gfc_vector2d(bounds.x + ((int)bounds.z / 2 + 1), bounds.y + ((int)bounds.w / 2 + 1)); //the center of a rectangle is the point (x+w/2,y+h/2)
 
 	self->grounded = 0;
 	//add to json file eventually?
@@ -55,6 +55,7 @@ GFC_Rect physics_obj_get_world_bounds_position(Physics_Object* self) {
 	gfc_vector2d_sub(bounds_pos, bounds_pos, self->center);
 	return bounds_pos;
 }
+
 GFC_Vector2D physics_get_test_position(Physics_Object* self) {
 	GFC_Vector2D test_velocity;
 	GFC_Vector2D test_position = { 0 };

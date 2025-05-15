@@ -165,7 +165,7 @@ void entity_draw(Entity* self) {
 
 		gf2d_draw_rect(rect, GFC_COLOR_YELLOW);
 
-		center_pos = gfc_rect(self->physics->position.x - 2, self->physics->position.y - 2, 5, 5); 
+		center_pos = gfc_rect(self->physics->position.x - 3, self->physics->position.y - 3, 5, 5); 
 		gfc_vector2d_add(center_pos, center_pos, camera_offset);
 		gf2d_draw_rect_filled(center_pos, GFC_COLOR_YELLOW);
 	}
@@ -185,6 +185,29 @@ void entity_configure_from_def(Entity* self, const char* name) {
 	}
 
 	entity_configure_from_json(self, json);
+}
+
+GFC_Rect entity_bounds_from_def(const char* name) {
+	SJson* json;
+	GFC_Vector4D bounds_vec = { 0 };
+	GFC_Rect bounds = { 0 };
+
+	if (!name) {
+		slog("cannot configure entity that does not exist or has no name");
+		return bounds;
+	}
+	json = gfc_config_def_get_by_name("entities", name); //may need to change the first parameter based on where entities end up, add new parameter to the function?
+
+	if (!json) {
+		slog("json for %s does not exist", name);
+		return bounds;
+	}
+	if (sj_object_get_vector4d(json, "bounds", &bounds_vec)) {
+		slog("got it");
+		bounds = gfc_rect_from_vector4(bounds_vec);
+		return bounds;
+	}
+	return bounds;
 }
 
 void entity_configure_from_file(Entity* self, const char* filename) {
@@ -442,4 +465,21 @@ GFC_List* entity_find_by_name(const char* entity_name) {
 		return NULL;
 	}
 	return entities;
+}
+
+Uint8 entity_test_collision_rect(GFC_Rect bounds) {
+	int i;
+	GFC_Rect other_bounds;
+	for (i = 0; i < entity_system.entity_max; i++) { //y change test
+		if (!entity_system.entity_list[i]._inuse) { 
+			continue;
+		}
+		if (physics_obj_test_collision_rect(entity_system.entity_list[i].physics, bounds)) {
+			slog("my bounds:%f, %f, %f, %f", bounds.x, bounds.y, bounds.w, bounds.h);
+			other_bounds = physics_obj_get_world_bounds_position(entity_system.entity_list[i].physics);
+			slog("other bounds: %f, %f, %f, %f", other_bounds.x, other_bounds.y, other_bounds.w, other_bounds.h);
+			return 1;
+		}
+	}
+	return 0;
 }

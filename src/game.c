@@ -12,11 +12,11 @@
 #include "font.h"
 #include "particle.h"
 #include "player.h"
+#include "spawn.h"
 #include "world.h"
 
 #include "bug.h"
 #include "bullet_bill.h"
-
 #include "coin.h"
 #include "brick.h"
 #include "ice.h"
@@ -39,6 +39,7 @@ int main(int argc, char * argv[])
     World* world;
 
     Uint32 ms;
+    Uint32 last_ms = 0;
     int mx,my;
     float mf = 0;
     Sprite *mouse;
@@ -130,8 +131,9 @@ int main(int argc, char * argv[])
         mf+=0.1;
         if (mf >= 16.0)mf = 0;
         
-        if (ms & SDL_BUTTON_X2MASK) {
+        if (ms & SDL_BUTTON_LMASK) { //this code just checks if the mouse has been pressed this frame (wasn't pressed last frame)
             particles_from_def("eruption", 100, gfc_vector2d(mx, my), gfc_vector2d(0, -1), gfc_vector2d(0, 0.1));
+            spawn_entity_to_world_gridlock(gfc_vector2d_added(gfc_vector2d(mx, my),camera_get_position()), "brick", NULL);
         }
             entity_system_think_all();
             entity_system_update_all();
@@ -169,6 +171,7 @@ int main(int argc, char * argv[])
         
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
+        last_ms = ms;
     }
     world_save(world, "worlds/world_save.world");
     entity_system_free_all();

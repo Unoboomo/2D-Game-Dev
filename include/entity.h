@@ -103,6 +103,13 @@ void entity_free(Entity* self);
 void entity_configure_from_def(Entity* self, const char* name);
 
 /**
+* @brief get the bounds of an entity based on provided name in a config def
+* @param name the name of the entity
+* @return returns a Rect of the bounds of the entity
+*/
+GFC_Rect entity_bounds_from_def(const char* name);
+
+/**
 * @brief configure an entity based on provided filename that contains a config
 * @param self the entity to config
 * @param filename the filename of the json providing entity information
@@ -171,5 +178,12 @@ void entity_collide_all(Entity* self);
 * @note the gfc_list returned must be cleaned up with gfc_list_delete
 */
 GFC_List* entity_find_by_name(const char* entity_name);
+
+/**
+* @brief checks to see a rect collides with any entities
+* @param bounds the rect being checked (in worldspace)
+* @return 1 if colliding, 0 if not
+*/
+Uint8 entity_test_collision_rect(GFC_Rect bounds);
 
 #endif
