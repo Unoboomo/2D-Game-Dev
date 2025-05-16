@@ -6,6 +6,7 @@
 #include "gfc_shape.h"
 #include "gfc_text.h"
 
+typedef struct Widget_S Widget;
 
 typedef struct Window_S
 {
@@ -17,12 +18,6 @@ typedef struct Window_S
     GFC_List* widgets;         /**<all the widgets of the window*/
 
     GFC_Color color;         /**<color to draw the window with*/
-
-    int (*update)(struct Window_S* win, GFC_List* updateList);
-    int (*draw)(struct Window_S* win);
-
-    int (*free_data)(struct Window_S* win);
-    void* data;             /**<custom data*/
 }Window;
 
 
@@ -40,7 +35,7 @@ void window_system_draw_all();
 /**
  * @brief update all active windows
  */
-void gf2d_windows_update_all();
+void windows_system_update_all();
 
 /**
  * @brief get a new initialized window
@@ -60,6 +55,12 @@ void window_free(Window* win);
  */
 void window_draw(Window* win);
 
+/**
+ * @brief update a window and all of its elements
+ * @param win the window to update
+ */
+void window_update(Window* win);
+
 Window* window_test();
 
 /**
@@ -77,29 +78,15 @@ void window_configure_from_file(Window* window, char* filename);
 void window_configure_from_json(Window* window, SJson* json);
 
 /**
- * @brief get a new initialized window loaded from a file
- * @param filename the filename of the config file for the window
- */
-Window* window_new_from_file(char* filename);
-
-/**
  * @brief add a gui element to the window
  * @param win the window to add an element to
  * @param w the element to add
  */
-//void gf2d_window_add_element(Window* win, Element* e);
+void window_add_widget(Window* win, Widget* widget);
 
 /**
- * @brief update a window and all of its elements
- * @param win the window to update
+ * @brief get a new initialized window loaded from a file
+ * @param filename the filename of the config file for the window
  */
-//void gf2d_window_update(Window* win);
-
-/**
- * @brief get the element from the window with the matching id
- * @param win the window to query
- * @param id the index to search for
- * @returns NULL on error or not found, a pointo to the element otherwise
- */
-//WElement* gf2d_window_get_element_by_id(Window* win, int id);
+Window* window_new_from_file(char* filename);
 #endif

@@ -1,17 +1,17 @@
 {
-  "dimensions": [ 50, 50, 1180, 620 ],
+  "dimensions": [ 0,0,1280,720 ],
   "color": [ 128, 128, 128, 240 ],
   "widgets": [
     {
-      "name": "main_menu_button",
-      "bounds": [ 450, 200, 250, 40 ],
+      "name": "play_button",
+      "bounds": [ 500, 300, 150, 40 ],
       "color": [ 0, 0, 0, 255 ],
-      "display_text": "Exit to main menu",
-      "pressed": "main"
-    },
+      "display_text": "Start Game",
+      "pressed": "start"
+    }
     {
       "name": "exit_button",
-      "bounds": [ 500, 300, 150, 40 ],
+      "bounds": [ 500, 400, 150, 40 ],
       "color": [ 0, 0, 0, 255 ],
       "display_text": "Exit Game",
       "pressed": "exit"

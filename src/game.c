@@ -29,24 +29,27 @@
 #include "one_way_wall.h"
 
 Uint8 _DRAWBOUNDS = 0;
-
+Uint32 ms;
+Uint32 last_ms = 0;
+int mx, my;
+int game_done;
+int in_main_menu;
 void parse_args(int argc, char* argv[]);
 
 int main(int argc, char * argv[])
 {
     /*variable declarations*/
-    int done = 0;
+    game_done = 0;
+    in_main_menu = 1;
     const Uint8 * keys;
     World* world;
 
-    Uint32 ms;
-    Uint32 last_ms = 0;
-    int mx,my;
     float mf = 0;
     Sprite *mouse;
     GFC_Color mouseGFC_Color = gfc_color8(216,2,0,255);
     
     Window* pause_menu;
+    Window* main_menu;
     Entity* player;
 
     Entity* bug;
@@ -121,11 +124,12 @@ int main(int argc, char * argv[])
     one_way_wall = one_way_wall_new(gfc_vector2d(1400, 900));
 
     data = (PlayerEntityData*)player->data;
+    main_menu = window_new_from_file("windows/main_menu.window");
     pause_menu = window_new_from_file("windows/pause_menu.window");
     slog("press [escape] to quit");
 
     /*main game loop*/
-    while(!done)
+    while(!game_done)
     {
         gfc_input_update(); // update SDL's internal event structures and input data
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
@@ -161,6 +165,9 @@ int main(int argc, char * argv[])
             entity_system_think_all();
             entity_system_update_all();
         }
+        else {
+            windows_system_update_all();
+        }
 
 
         sprintf(formatted_string, "Coins: %d\nLives: %d", data->coin_count, data->lives_count);
@@ -195,7 +202,7 @@ int main(int argc, char * argv[])
 
         gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
         
-        if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
+        if (keys[SDL_SCANCODE_ESCAPE])game_done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
         last_ms = ms;
     }

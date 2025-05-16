@@ -5,6 +5,8 @@
 #include "gf2d_draw.h"
 #include "gf2d_graphics.h"
 
+#include "widgets.h"
+
 #include "windows.h"
 
 typedef struct
@@ -62,6 +64,15 @@ void window_system_draw_all() {
     }
 }
 
+void windows_system_update_all() {
+    int i;
+    for (i = 0; i < window_system.window_max; i++) {
+        if (window_system.window_list[i]._inuse && window_system.window_list[i].visible) {
+            window_update(&window_system.window_list[i]);
+        }
+    }
+}
+
 Window* window_new() {
     int i;
     for (i = 0; i < window_system.window_max; i++)
@@ -80,18 +91,20 @@ Window* window_new() {
 
 void window_free(Window* win) {
     int i, count;
+    Widget* widget;
 
     if (!win)return;
-
-    if (win->free_data != NULL)
-    {
-        win->free_data(win);
-    }
 
     count = gfc_list_get_count(win->widgets);
 
     for (i = 0; i < count; i++) {
-        //free widget
+        widget = (Widget*)gfc_list_get_nth(win->widgets, i);
+
+        if (!widget) {
+            continue;
+        }
+
+        widget_free(widget);
     }
     gfc_list_delete(win->widgets);
 
@@ -101,6 +114,8 @@ void window_free(Window* win) {
 void window_draw(Window* win) {
     int count, i;
     GFC_Vector2D offset;
+    Widget* widget;
+
     if (!win || !win->visible) {
         return;
     }
@@ -113,7 +128,37 @@ void window_draw(Window* win) {
     count = gfc_list_get_count(win->widgets);
     for (i = 0; i < count; i++)
     {
-        //draw widgets
+        widget = (Widget*)gfc_list_get_nth(win->widgets, i);
+
+        if (!widget) {
+            continue;
+        }
+
+        widget_draw(widget, offset);
+    }
+}
+
+void window_update(Window* win)
+{
+    int count, i;
+    GFC_Vector2D offset;
+    Widget* widget;
+
+    if (!win)return;
+
+    offset.x = win->dimensions.x;
+    offset.y = win->dimensions.y;
+
+    count = gfc_list_get_count(win->widgets);
+    for (i = 0; i < count; i++)
+    {
+        widget = (Widget*)gfc_list_get_nth(win->widgets, i);
+
+        if (!widget) {
+            continue;
+        }
+
+        widget_update(widget, offset);
     }
 }
 
@@ -132,6 +177,7 @@ Window* window_test() {
     window->color = GFC_COLOR_GREY;
     window->color.a = 240;
     window->visible = 0;
+    gfc_list_append(window->widgets, widget_button_new_test());
     return window;
 }
 
@@ -153,7 +199,7 @@ void window_configure_from_file(Window* window, char* filename) {
 
 void window_configure_from_json(Window* window, SJson* json) {
     int i, count;
-    SJson* elements, * value;
+    SJson* widgets, * value;
     const char* buffer;
     GFC_Vector4D bounds = { 0 };
 
@@ -169,17 +215,21 @@ void window_configure_from_json(Window* window, SJson* json) {
     window->visible = 0;
 
 
-    /**
-    * ADD WINDOW WIDGETS
-    elements = sj_object_get_value(json, "elements");
-    count = sj_array_get_count(elements);
-    for (i = 0; i < count; i++)
-    {
-        value = sj_array_get_nth(elements, i);
+    
+    widgets = sj_object_get_value(json, "widgets");
+    count = sj_array_get_count(widgets);
+    for (i = 0; i < count; i++) {
+        value = sj_array_get_nth(widgets, i);
         if (!value)continue;
-        gf2d_window_add_element(win, gf2d_element_load_from_config(value, NULL, win));
+        window_add_widget(window, widget_button_configure_from_json(value));
     }
-    */
+}
+
+void window_add_widget(Window* win, Widget* widget)
+{
+    if (!win)return;
+    if (!widget)return;
+    gfc_list_append(win->widgets, widget);
 }
 
 Window* window_new_from_file(char* filename) {
