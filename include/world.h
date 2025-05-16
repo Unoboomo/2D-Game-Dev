@@ -22,6 +22,13 @@ typedef struct
 void world_tile_layer_build(World* world);
 
 /**
+* @brief spawns a tile to the world
+* @param position the position to spawn the tile
+* @param tile_value what type of tile to spawn
+*/
+void world_spawn_tile(GFC_Vector2D position, int tile_value);
+
+/**
 * @breif saves world to a config file
 * @param a pointer to the world to save
 * @param filename the name of the world file to save to
@@ -68,6 +75,14 @@ void world_free(World* world);
 * @return the value of the tile (and 0 on Error)
 */
 Uint8 world_get_tile_at(World* world, GFC_Vector2D position);
+
+/**
+* @breif sets the value of the tile in a tile map
+* @param world the world whos tilemap to search
+* @param position the position in the tilemap of the tile
+* @param tile_value the value of the tile 
+*/
+void world_set_tile_at(World* world, GFC_Vector2D position, int tile_value);
 
 /**
 * @brief draws an world background to the screen

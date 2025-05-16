@@ -475,9 +475,7 @@ Uint8 entity_test_collision_rect(GFC_Rect bounds) {
 			continue;
 		}
 		if (physics_obj_test_collision_rect(entity_system.entity_list[i].physics, bounds)) {
-			slog("my bounds:%f, %f, %f, %f", bounds.x, bounds.y, bounds.w, bounds.h);
 			other_bounds = physics_obj_get_world_bounds_position(entity_system.entity_list[i].physics);
-			slog("other bounds: %f, %f, %f, %f", other_bounds.x, other_bounds.y, other_bounds.w, other_bounds.h);
 			return 1;
 		}
 	}

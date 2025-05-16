@@ -2,6 +2,7 @@
 #include "simple_json.h"
 
 #include "camera.h"
+#include "entity.h"
 
 #include "world.h"
 
@@ -120,6 +121,32 @@ SJson* world_tile_map_save(World* world) {
 
 	sj_free(tile_map_row);
 	return json;
+}
+
+void world_spawn_tile(GFC_Vector2D position, int tile_value) {
+	World* world;
+	world = world_get_active();
+	GFC_Rect bounds;
+
+	if (!world) {
+		slog("no active world to spawn an entity to");
+		return;
+	}
+	if (!world->tileset) {
+		slog("no way to find tile width and tile height");
+		return;
+	}
+
+	position.x = (int)position.x / world->tileset->frame_w;
+	position.y = (int)position.y / world->tileset->frame_h;
+
+	bounds = gfc_rect(position.x * world->tileset->frame_w, position.y * world->tileset->frame_h, world->tileset->frame_w, world->tileset->frame_h);
+	if (entity_test_collision_rect(bounds)) {
+		slog("cannot spawn an tile here, it would collide with an entity");
+		return;
+	}
+	world_set_tile_at(world, position, tile_value);
+	world_tile_layer_build(world);
 }
 
 void world_save(World* world, const char *filename) {
@@ -367,6 +394,15 @@ Uint8 world_get_tile_at(World* world, GFC_Vector2D position) {
 		return 0;
 	}
 	return world->tile_map[(Uint32)position.y * (Uint32)world->tile_width + (Uint32)position.x];
+}
+
+void world_set_tile_at(World* world, GFC_Vector2D position, int tile_value) {
+	if (!world || !world->tile_map) {
+		slog("cannot set a tile in world or tile_map that does not exist");
+		return 0;
+	}
+
+	world->tile_map[(Uint32)position.y * (Uint32)world->tile_width + (Uint32)position.x] = tile_value;
 }
 
 void world_draw_background(World* world) {
