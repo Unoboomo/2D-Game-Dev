@@ -499,3 +499,12 @@ Uint8 world_test_collision_rect(World* world, GFC_Rect bounds) {
 	}
 	return 0;
 }
+
+void world_switch_to_next() {
+	Entity* player;
+	world_free(active_world);
+	world_load("worlds/testworld.world");
+	entity_system_free_all_but_player();
+	player = entity_get_player();
+	player->physics->position = gfc_vector2d(20, 20);
+}

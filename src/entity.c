@@ -68,6 +68,14 @@ void entity_system_free_all() {
 	}
 }
 
+void entity_system_free_all_but_player() {
+	int i;
+	for (i = 0; i < entity_system.entity_max; i++) {
+		if (entity_system.entity_list[i]._inuse && !entity_system.entity_list[i].player) {
+			entity_free(&entity_system.entity_list[i]);
+		}
+	}
+}
 
 void entity_system_draw_all() {
 	int i;

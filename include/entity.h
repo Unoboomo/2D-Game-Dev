@@ -65,6 +65,8 @@ void entity_system_init(Uint32 max);
 */
 void entity_system_free_all();
 
+void entity_system_free_all_but_player();
+
 /**
 * @brief Draw all entities in the manager
 */

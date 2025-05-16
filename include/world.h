@@ -110,4 +110,6 @@ void world_setup_camera(World* world);
 */
 Uint8 world_test_collision_rect(World* world, GFC_Rect bounds);
 
+void world_switch_to_next();
+
 #endif

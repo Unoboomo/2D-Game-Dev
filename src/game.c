@@ -43,7 +43,6 @@ int main(int argc, char * argv[])
     game_done = 0;
     in_main_menu = 1;
     const Uint8 * keys;
-    World* world;
 
     float mf = 0;
     Sprite *mouse;
@@ -127,7 +126,7 @@ int main(int argc, char * argv[])
     one_way_wall = one_way_wall_new(gfc_vector2d(1400, 900));
     */
 
-    world = world_load("worlds/world_save.world");
+    world_load("worlds/world_save.world");
 
     background_music = gfc_sound_load_music("audio/00. The Tale of a Cruel World.wav");
     gfc_sound_load("audio/Wilhelm.wav", 1, 2);
@@ -192,11 +191,11 @@ int main(int argc, char * argv[])
         // all drawing should happen betweem clear_screen and next_frame
             //backgrounds drawn first
 
-            world_draw_background(world);
+            world_draw_background(world_get_active());
 
             particle_system_draw();
 
-            world_draw_tile_layer(world);
+            world_draw_tile_layer(world_get_active());
 
             //draw entities next
             entity_system_draw_all();
@@ -221,11 +220,14 @@ int main(int argc, char * argv[])
         if (keys[SDL_SCANCODE_ESCAPE])game_done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
         last_ms = ms;
+        if (gfc_input_command_pressed("next_world")) {
+            world_switch_to_next();
+        }
     }
     Mix_FreeMusic(background_music);
-    world_save(world, "worlds/world_save1.world");
+    world_save(world_get_active(), "worlds/world_save1.world");
     entity_system_free_all();
-    world_free(world);
+    world_free(world_get_active());
     slog("---==== END ====---");
     return 0;
 }
