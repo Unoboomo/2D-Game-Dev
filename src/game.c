@@ -13,6 +13,7 @@
 #include "particle.h"
 #include "player.h"
 #include "spawn.h"
+#include "windows.h"
 #include "world.h"
 
 #include "bug.h"
@@ -45,6 +46,7 @@ int main(int argc, char * argv[])
     Sprite *mouse;
     GFC_Color mouseGFC_Color = gfc_color8(216,2,0,255);
     
+    Window* pause_menu;
     Entity* player;
 
     Entity* bug;
@@ -84,10 +86,12 @@ int main(int argc, char * argv[])
     gfc_input_init("config/input.cfg");
     gf2d_graphics_set_frame_delay(16);
     gf2d_sprite_init(1024);
-    particle_system_init(10000);
     font_init();
     gfc_config_def_init();
+    particle_system_init(10000);
     entity_system_init(256); 
+    windows_init(10);
+
     SDL_ShowCursor(SDL_DISABLE);
     camera_set_size(gfc_vector2d(1280, 720));
     
@@ -117,7 +121,7 @@ int main(int argc, char * argv[])
     one_way_wall = one_way_wall_new(gfc_vector2d(1400, 900));
 
     data = (PlayerEntityData*)player->data;
-  
+    pause_menu = window_new_from_file("windows/pause_menu.window");
     slog("press [escape] to quit");
 
     /*main game loop*/
@@ -131,6 +135,19 @@ int main(int argc, char * argv[])
         mf+=0.1;
         if (mf >= 16.0)mf = 0;
         
+        //check window stuff
+        if (gfc_input_command_pressed("toggle_window")) {
+            if (pause_menu->visible) {
+                pause_menu->visible = 0;
+            }
+            else {
+                pause_menu->visible = 1;
+            }
+        }
+         
+
+        /**
+        * Test Stuff for Level Editor and Particles
         if (ms & SDL_BUTTON_X2MASK && !(last_ms & SDL_BUTTON_X2MASK)) { //this code just checks if the mouse has been pressed this frame (wasn't pressed last frame)
             particles_from_def("eruption", 100, gfc_vector2d(mx, my), gfc_vector2d(0, -1), gfc_vector2d(0, 0.1));
             spawn_entity_to_world_gridlock(gfc_vector2d_added(gfc_vector2d(mx, my),camera_get_position()), "brick", NULL);
@@ -139,9 +156,12 @@ int main(int argc, char * argv[])
         if (ms & SDL_BUTTON_LMASK && !(last_ms & SDL_BUTTON_LMASK)) { //this code just checks if the mouse has been pressed this frame (wasn't pressed last frame)
             world_spawn_tile(gfc_vector2d_added(gfc_vector2d(mx, my), camera_get_position()), 0);
         }
-        
+        */
+        if (!pause_menu->visible) {
             entity_system_think_all();
             entity_system_update_all();
+        }
+
 
         sprintf(formatted_string, "Coins: %d\nLives: %d", data->coin_count, data->lives_count);
 
@@ -160,6 +180,7 @@ int main(int argc, char * argv[])
 
             font_draw_test(formatted_string, FS_medium, GFC_COLOR_WHITE, gfc_vector2d(10, 10));
 
+            window_system_draw_all();
 
             //UI elements last
             gf2d_sprite_draw(
