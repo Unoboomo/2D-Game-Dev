@@ -373,7 +373,6 @@ World* world_new(Uint32 width, Uint32 height) {
 	world->tile_map = gfc_allocate_array(sizeof(Uint8), height * width);
 	world->tile_height = height;
 	world->tile_width = width;
-	slog("allocate a new world");
 	return world;
 }
 
@@ -399,7 +398,7 @@ Uint8 world_get_tile_at(World* world, GFC_Vector2D position) {
 void world_set_tile_at(World* world, GFC_Vector2D position, int tile_value) {
 	if (!world || !world->tile_map) {
 		slog("cannot set a tile in world or tile_map that does not exist");
-		return 0;
+		return;
 	}
 
 	world->tile_map[(Uint32)position.y * (Uint32)world->tile_width + (Uint32)position.x] = tile_value;

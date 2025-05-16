@@ -44,7 +44,6 @@ Entity* player_new(GFC_Vector2D position) {
 		//set data here
 		self->data = data;
 		data->lives_count = 5;
-		slog("data is set");
 	}
 	else {
 		slog("failed to create player_entity_data");

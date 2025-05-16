@@ -200,7 +200,6 @@ void window_configure_from_file(Window* window, char* filename) {
 void window_configure_from_json(Window* window, SJson* json) {
     int i, count;
     SJson* widgets, * value;
-    const char* buffer;
     GFC_Vector4D bounds = { 0 };
 
     if ((!window) || (!json)) {

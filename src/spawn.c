@@ -85,6 +85,66 @@ static SpawnLinks spawnlist[] =
 };
 
 size_t list_length = sizeof(spawnlist) / sizeof(spawnlist[0]);
+/**
+* I Dont Know if This Works
+void spawn_entities_from_json(SJson* json) {
+	int count;
+	int i;
+	SJson* entity;
+	const char* name;
+	int found = 0;
+	GFC_Vector2D spawn_position = { 0 }; //represents the tilemap position, not the world position. 
+	if (!json) {
+		slog("cannot spawn entities from a json that does not exist");
+		return;
+	}
+
+	if (!sj_is_array(json)) {
+		slog("entity array is not an array");
+		return;
+	}
+
+	count = sj_array_get_count(json);
+	for (i = 0; i < count; i++) {
+		found = 0;
+		name = NULL;
+		entity = NULL;
+		gfc_vector2d_clear(spawn_position);
+
+		entity = sj_array_get_nth(json, i);
+		if (!entity) {
+			slog("%dth entity data missing", i);
+			continue;
+		}
+
+		name = sj_object_get_value_as_string(entity, "name");
+		if (!name) {
+			slog("%dth entity missing name",i);
+			continue;
+		}
+
+		if (!sj_object_get_vector2d(entity, "spawn_position", &spawn_position)) {
+			slog("%dth entity missing spawn position", i);
+			continue;
+		}
+		
+		
+		for (i = 0; i < list_length; i++) {
+			if (strcmp(spawnlist[i].name, name) == 0) {
+				found = 1;
+				break;
+			}
+		}
+
+		if (!found) {
+			slog("No spawn function found for entity name: %s", name);
+			return;
+		}
+
+		spawnlist[i].spawn(spawn_position);
+	}
+}
+*/
 
 void spawn_entity_to_world(GFC_Vector2D spawn_position, const char* entity_name, const char* contents) {
 	GFC_Rect bounds = { 0 };
@@ -157,7 +217,6 @@ Uint8 spawn_check_bounds_against_world(GFC_Rect bounds) {
 		slog("no active world to check bounds against");
 		return 0;
 	}
-	slog("bounds: %f, %f, %f, %f", bounds.x, bounds.y, bounds.w, bounds.h);
 	return world_test_collision_rect(world, bounds);
 }
 

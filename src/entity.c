@@ -251,6 +251,59 @@ void entity_configure_from_json(Entity* self, SJson* json)
 
 	physics_obj_configure(self->physics, json);
 }
+/**
+* I DONT KNOW FI THIS WORKS
+SJson* entity_save_all_to_config() {
+	SJson* json;
+	SJson* entity;
+	SJson* position;
+	int i,j;
+
+	json = sj_array_new();
+
+	if (!json) {
+		slog("failed to create an array for entities");
+		return NULL;
+	}
+
+	entity = sj_object_new();
+
+	if (!entity) {
+		slog("failed to create new entity object");
+		sj_free(json);
+		return NULL;
+	}
+
+	position = sj_array_new();
+	if (!position) {
+		slog("failed to create new position object");
+		sj_free(json);
+		sj_free(entity);
+		return NULL;
+	}
+
+	for (i = 0; i < entity_system.entity_max; i++) {
+		if (entity_system.entity_list[i]._inuse) {
+			sj_array_append(position, sj_new_float(entity_system.entity_list[i].physics->position.x));
+			sj_array_append(position, sj_new_float(entity_system.entity_list[i].physics->position.y));
+			sj_object_insert(entity, "name", sj_new_str(entity_system.entity_list[i].name));
+			sj_object_insert(entity, "spawn_position", sj_copy(position));
+
+			sj_array_append(json, sj_copy(entity));
+
+			sj_object_delete_key(entity, "name");
+			sj_object_delete_key(entity, "spawn_position");
+
+			for (j = sj_array_count(position) - 1; j >= 0; j--) {
+				sj_array_delete_nth(position, j);
+			}
+		}
+	}
+	sj_free(entity);
+	sj_free(position);
+	return json;
+}
+*/
 
 void entity_update_position(Entity* self) {
 
