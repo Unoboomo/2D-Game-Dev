@@ -35,6 +35,10 @@ static SpawnLinks spawnlist[] =
 		bug2_new
 	},
 	{
+		"bug3",
+		bug3_new
+	},
+	{
 		"bullet_bill",
 		bullet_bill_new
 	},

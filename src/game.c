@@ -170,11 +170,11 @@ int main(int argc, char * argv[])
             particles_from_def("eruption", 100, gfc_vector2d(mx, my), gfc_vector2d(0, -1), gfc_vector2d(0, 0.1));
             spawn_entity_to_world_gridlock(gfc_vector2d_added(gfc_vector2d(mx, my),camera_get_position()), "brick", NULL);
         }
-
-        if (ms & SDL_BUTTON_LMASK && !(last_ms & SDL_BUTTON_LMASK)) { //this code just checks if the mouse has been pressed this frame (wasn't pressed last frame)
-            world_spawn_tile(gfc_vector2d_added(gfc_vector2d(mx, my), camera_get_position()), 0);
-        }
         */
+        if (ms & SDL_BUTTON_LMASK && !(last_ms & SDL_BUTTON_LMASK)) { //this code just checks if the mouse has been pressed this frame (wasn't pressed last frame)
+            world_spawn_tile(gfc_vector2d_added(gfc_vector2d(mx, my), camera_get_position()), 3);
+        }
+        
         if (!pause_menu->visible) {
             entity_system_think_all();
             entity_system_update_all();
