@@ -126,6 +126,8 @@ void entity_configure_from_file(Entity* self, const char* filename);
 */
 void entity_configure_from_json(Entity* self, SJson* json);
 
+SJson* entity_save_all_to_config();
+
 /**
 * @brief updates the position of an entity from its velocity and ensures it is still in the window
 * @param *self a pointer to the entity to update the position of
@@ -189,4 +191,5 @@ GFC_List* entity_find_by_name(const char* entity_name);
 */
 Uint8 entity_test_collision_rect(GFC_Rect bounds);
 
+Entity* entity_get_player();
 #endif

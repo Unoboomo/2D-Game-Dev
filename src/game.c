@@ -51,6 +51,7 @@ int main(int argc, char * argv[])
     Mix_Music* background_music;
     Window* pause_menu;
     Window* main_menu;
+    /*
     Entity* player;
 
     Entity* bug;
@@ -70,10 +71,10 @@ int main(int argc, char * argv[])
     Entity* trampoline;
     Entity* p_switch;
     Entity* one_way_wall;
-
+    */
     char formatted_string[100];
 
-    PlayerEntityData* data;
+    PlayerEntityData* data = NULL;
 
     /*program initializtion*/
     init_logger("gf2d.log",0);
@@ -106,6 +107,7 @@ int main(int argc, char * argv[])
 
     /*demo setup*/
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
+    /*
     player = player_new(gfc_vector2d(20, 20));
     bug = bug_new(gfc_vector2d(200, 200));
     bug2 = bug2_new(gfc_vector2d(300, 200));
@@ -113,7 +115,6 @@ int main(int argc, char * argv[])
     platform = platform_new(gfc_vector2d(850, 900));
 
     coin = coin_new(gfc_vector2d(900, 900));
-    world = world_load("worlds/testworld.world");
     brick = brick_new(gfc_vector2d(950, 900));
     ice1 = ice_new(gfc_vector2d(1000, 900));
     ice2 = ice_new(gfc_vector2d(1050, 900));
@@ -124,12 +125,16 @@ int main(int argc, char * argv[])
     trampoline = trampoline_new(gfc_vector2d(1250, 900));
     p_switch = p_switch_new(gfc_vector2d(1350, 900));
     one_way_wall = one_way_wall_new(gfc_vector2d(1400, 900));
+    */
+
+    world = world_load("worlds/world_save.world");
 
     background_music = gfc_sound_load_music("audio/00. The Tale of a Cruel World.wav");
     gfc_sound_load("audio/Wilhelm.wav", 1, 2);
 
-
-    data = (PlayerEntityData*)player->data;
+    if (entity_get_player()) {
+        data = (PlayerEntityData*)entity_get_player()->data;
+    }
     main_menu = window_new_from_file("windows/main_menu.window");
     pause_menu = window_new_from_file("windows/pause_menu.window");
     slog("press [escape] to quit");
@@ -159,9 +164,7 @@ int main(int argc, char * argv[])
             }
         }
          
-        if (ms & SDL_BUTTON_X2MASK && !(last_ms & SDL_BUTTON_X2MASK)) { //this code just checks if the mouse has been pressed this frame (wasn't pressed last frame)
-            particles_from_def("blood_splatter", 1000, gfc_vector2d(mx, my), gfc_vector2d(0, -1), gfc_vector2d(0, 0.1));
-        }
+        
         /**
         * Test Stuff for Level Editor and Particles
         if (ms & SDL_BUTTON_X2MASK && !(last_ms & SDL_BUTTON_X2MASK)) { //this code just checks if the mouse has been pressed this frame (wasn't pressed last frame)
@@ -181,8 +184,9 @@ int main(int argc, char * argv[])
             windows_system_update_all();
         }
 
-
-        sprintf(formatted_string, "Coins: %d\nLives: %d", data->coin_count, data->lives_count);
+        if (data) {
+            sprintf(formatted_string, "Coins: %d\nLives: %d", data->coin_count, data->lives_count);
+        }
 
         gf2d_graphics_clear_screen();// clears drawing buffers
         // all drawing should happen betweem clear_screen and next_frame
@@ -219,7 +223,7 @@ int main(int argc, char * argv[])
         last_ms = ms;
     }
     Mix_FreeMusic(background_music);
-    world_save(world, "worlds/world_save.world");
+    world_save(world, "worlds/world_save1.world");
     entity_system_free_all();
     world_free(world);
     slog("---==== END ====---");

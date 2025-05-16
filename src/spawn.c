@@ -72,7 +72,7 @@ static SpawnLinks spawnlist[] =
 	},
 	{
 		"invisible_question_block",
-		bug2_new
+		invisible_question_block_new
 	},
 	{
 		"empty_question_block",
@@ -85,11 +85,10 @@ static SpawnLinks spawnlist[] =
 };
 
 size_t list_length = sizeof(spawnlist) / sizeof(spawnlist[0]);
-/**
-* I Dont Know if This Works
+
 void spawn_entities_from_json(SJson* json) {
 	int count;
-	int i;
+	int i,j;
 	SJson* entity;
 	const char* name;
 	int found = 0;
@@ -129,8 +128,8 @@ void spawn_entities_from_json(SJson* json) {
 		}
 		
 		
-		for (i = 0; i < list_length; i++) {
-			if (strcmp(spawnlist[i].name, name) == 0) {
+		for (j = 0; j < list_length; j++) {
+			if (strcmp(spawnlist[j].name, name) == 0) {
 				found = 1;
 				break;
 			}
@@ -141,10 +140,10 @@ void spawn_entities_from_json(SJson* json) {
 			return;
 		}
 
-		spawnlist[i].spawn(spawn_position);
+		spawnlist[j].spawn(spawn_position);
 	}
 }
-*/
+
 
 void spawn_entity_to_world(GFC_Vector2D spawn_position, const char* entity_name, const char* contents) {
 	GFC_Rect bounds = { 0 };

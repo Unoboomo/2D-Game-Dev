@@ -251,8 +251,7 @@ void entity_configure_from_json(Entity* self, SJson* json)
 
 	physics_obj_configure(self->physics, json);
 }
-/**
-* I DONT KNOW FI THIS WORKS
+
 SJson* entity_save_all_to_config() {
 	SJson* json;
 	SJson* entity;
@@ -303,7 +302,6 @@ SJson* entity_save_all_to_config() {
 	sj_free(position);
 	return json;
 }
-*/
 
 void entity_update_position(Entity* self) {
 
@@ -533,4 +531,15 @@ Uint8 entity_test_collision_rect(GFC_Rect bounds) {
 		}
 	}
 	return 0;
+}
+
+Entity* entity_get_player() {
+	int i;
+	for (i = 0; i < entity_system.entity_max; i++) { 
+		if (!entity_system.entity_list[i].player) { 
+			continue;
+		}
+		return &entity_system.entity_list[i];
+	}
+	return NULL;
 }

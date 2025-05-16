@@ -3,6 +3,7 @@
 
 #include "camera.h"
 #include "entity.h"
+#include "spawn.h"
 
 #include "world.h"
 
@@ -189,7 +190,7 @@ void world_save(World* world, const char *filename) {
 		}
 		sj_object_insert(world_json, "tile_map", tile_map_json);
 	}
-
+	sj_object_insert(world_json, "spawn_list", entity_save_all_to_config());
 	sj_object_insert(json, "world", world_json);
 	sj_save(json, filename);
 	sj_free(json);
@@ -313,9 +314,10 @@ World* world_load(const char* filename) {
 		frame_h,
 		frames_per_line,
 		1);
-
 	world_tile_layer_build(world);
+	item = sj_object_get_value(wjson, "spawn_list");
 
+	spawn_entities_from_json(item);
 	sj_free(json);
 	active_world = world;
 	world_setup_camera(world);
