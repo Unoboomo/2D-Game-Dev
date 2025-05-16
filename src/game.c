@@ -149,7 +149,9 @@ int main(int argc, char * argv[])
             }
         }
          
-
+        if (ms & SDL_BUTTON_X2MASK && !(last_ms & SDL_BUTTON_X2MASK)) { //this code just checks if the mouse has been pressed this frame (wasn't pressed last frame)
+            particles_from_def("blood_splatter", 1000, gfc_vector2d(mx, my), gfc_vector2d(0, -1), gfc_vector2d(0, 0.1));
+        }
         /**
         * Test Stuff for Level Editor and Particles
         if (ms & SDL_BUTTON_X2MASK && !(last_ms & SDL_BUTTON_X2MASK)) { //this code just checks if the mouse has been pressed this frame (wasn't pressed last frame)

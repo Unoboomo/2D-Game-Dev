@@ -111,6 +111,7 @@ void bug_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 
 	if (other->player) {
 		if (collision_side.y < 0 && !physics_obj_collision_check(self->physics, other->physics)) {//if collision was top
+			particles_from_def("blood_splatter", 1000, self->physics->position, gfc_vector2d(0, -1), gfc_vector2d(0, 0.1));
 			entity_free(self);
 		}
 		else {

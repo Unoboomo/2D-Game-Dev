@@ -50,6 +50,7 @@ void coin_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 			data->lives_count++;
 		}
 	}
+	particles_from_def("sparkle", 10, self->physics->position, gfc_vector2d(0, -1), gfc_vector2d(0, 0.1));
 
 	entity_free(self);
 }

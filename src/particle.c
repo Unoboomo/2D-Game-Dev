@@ -4,6 +4,8 @@
 #include "gfc_config_def.h"
 #include "gf2d_draw.h"
 
+#include "camera.h"
+
 #include "particle.h"
 
 typedef struct {
@@ -57,6 +59,7 @@ void particle_system_clear() {
 }
 
 void particle_draw(Particle* particle) {
+	GFC_Vector2D draw_position;
 	if (!particle) {
 		return;
 	}
@@ -85,23 +88,23 @@ void particle_draw(Particle* particle) {
 			}
 		}
 	}
-
+	gfc_vector2d_add(draw_position, particle->position, camera_get_offset());
 	switch (particle->p_type) {
  		case PT_Point:
-			gf2d_draw_pixel(particle->position, particle->color);
+			gf2d_draw_pixel(draw_position, particle->color);
 			break;
 		case PT_Shape:
-			gf2d_draw_shape(particle->shape, particle->color, particle->position);
+			gf2d_draw_shape(particle->shape, particle->color, draw_position);
 			break;
 		case PT_Sprite:
 			gf2d_sprite_draw(
 				particle->sprite,
-				particle->position,
+				draw_position,
 				NULL,
 				NULL,
 				NULL,
 				NULL,
-				&particle->color,
+				particle->color_mod ? &particle->color : NULL,
 				(Uint32) particle->frame);
 			break;
 	}
@@ -215,7 +218,7 @@ Particle* particle_from_json(SJson* json, GFC_Vector2D position, GFC_Vector2D di
 	gfc_vector2d_scale(p->velocity, p->velocity, speed);
 	gfc_vector2d_copy(p->acceleration, acceleration);
 
-
+	sj_object_get_int(json, "color_mod", &p->color_mod);
 	sj_object_get_color_value(json, "color",&p->color);
 	sj_object_get_color_value(json, "color_velocity", &p->color_velocity);
 	if (sj_object_get_color_value(json, "color_variance", &color_variance)) {

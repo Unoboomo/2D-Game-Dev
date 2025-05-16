@@ -26,6 +26,7 @@ typedef struct {
 	GFC_Vector2D	velocity;		//how fast the particle is moving
 	GFC_Vector2D	acceleration;	//how fast the velocity changes 
 	
+	int				color_mod;		//1 = yes, 0 = no;
 	GFC_Color		color;			//the color of the particle
 	GFC_Color		color_velocity;	//change in color over time		
 

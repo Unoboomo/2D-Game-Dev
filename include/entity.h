@@ -8,6 +8,7 @@
 #include "gf2d_sprite.h"
 
 #include "physics.h"
+#include "particle.h"
 
 typedef enum { //entities of the same type do not collide with each other
 	ETT_none,

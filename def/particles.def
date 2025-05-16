@@ -1,26 +1,27 @@
 {
   "particles": [
     {
-      "name": "blood_spaltter",
+      "name": "blood_splatter",
 
       "this is a comment": "int representing particle type: 0=PT_Point,\t1=PT_Shape,\t2=PT_Sprite",
-      "particle_type": 0,
+      "particle_type": 1,
 
       "ttl": 100,
       "ttl_variance": 20,
 
-      "angle_variance": 20,
+      "angle_variance": 180,
       "speed": 3,
       "speed_variance": 1,
 
-      "this is a comment ": "all colors in rgba 0-255",
+      "this is a comment ": "all colors in rgba 0-255, color_mod = 1 = yes, 0 = no",
+      "color_mod": 1,
       "color": [ 216, 2, 0, 255 ],
       "color_velocity": [ 0, 0, 0, 0 ],
       "color_variance": [ 0, 0, 0, 0 ],
 
       "this is a comment  ": "int representing shape type: 0=ST_RECT, 1=ST_CIRCLE, 2=ST_EDGE",
-      "shape_type": 1,
-      "shape": [ 0, 0, 10 ],
+      "shape_type": 2,
+      "shape": [ 0, 0, 10, 0 ],
 
       "sprite": "images/brick.png",
       "sprite_size": [ 45, 45 ],
@@ -44,13 +45,102 @@
       "speed": 4,
       "speed_variance": 0.2,
 
-      "this is a comment ": "all colors in rgba 0-255",
+      "this is a comment ": "all colors in rgba 0-255, color_mod = 1 = yes, 0 = no",
+      "color_mod": 1,
       "color": [ 229, 70, 13, 204 ],
       "color_velocity": [ 0, 0, 0, 0 ],
       "color_variance": [ 26, 70, 13, 0 ],
 
       "sprite": "images/cloud.png",
       "sprite_size": [ 16, 16 ],
+      "sprite_fpl": 1,
+
+      "frame_rate": 0,
+      "frame_start": 0,
+      "frame_end": 0,
+      "loops": 0
+    },
+    {
+      "name": "brick_chunk_1",
+
+      "this is a comment": "int representing particle type: 0=PT_Point,\t1=PT_Shape,\t2=PT_Sprite",
+      "particle_type": 2,
+
+      "ttl": 200,
+      "ttl_variance": 20,
+
+      "angle_variance": 35,
+      "speed": 5,
+      "speed_variance": 0.2,
+
+      "this is a comment ": "all colors in rgba 0-255, color_mod = 1 = yes, 0 = no",
+      "color_mod": 0,
+      "color": [ 0, 0, 0, 0 ],
+      "color_velocity": [ 0, 0, 0, 0 ],
+      "color_variance": [ 0, 0, 0, 0 ],
+
+      "sprite": "images/brick_chunk_1.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1,
+
+      "frame_rate": 0,
+      "frame_start": 0,
+      "frame_end": 0,
+      "loops": 0
+    },
+    {
+      "name": "brick_chunk_2",
+
+      "this is a comment": "int representing particle type: 0=PT_Point,\t1=PT_Shape,\t2=PT_Sprite",
+      "particle_type": 2,
+
+      "ttl": 200,
+      "ttl_variance": 20,
+
+      "angle_variance": 70,
+      "speed": 5,
+      "speed_variance": 0.2,
+
+      "this is a comment ": "all colors in rgba 0-255, color_mod = 1 = yes, 0 = no",
+      "color_mod": 0,
+      "color": [ 0, 0, 0, 0 ],
+      "color_velocity": [ 0, 0, 0, 0 ],
+      "color_variance": [ 0, 0, 0, 0 ],
+
+      "sprite": "images/brick_chunk_2.png",
+      "sprite_size": [ 45, 45 ],
+      "sprite_fpl": 1,
+
+      "frame_rate": 0,
+      "frame_start": 0,
+      "frame_end": 0,
+      "loops": 0
+    },
+    {
+      "name": "sparkle",
+
+      "this is a comment": "int representing particle type: 0=PT_Point,\t1=PT_Shape,\t2=PT_Sprite",
+      "particle_type": 1,
+
+      "ttl": 20,
+      "ttl_variance": 5,
+
+      "angle_variance": 180,
+      "speed": 4,
+      "speed_variance": 0.2,
+
+      "this is a comment ": "all colors in rgba 0-255, color_mod = 1 = yes, 0 = no",
+      "color_mod": 1,
+      "color": [ 255, 255, 0, 255 ],
+      "color_velocity": [ 0, 0, 0, 0 ],
+      "color_variance": [ 0, 0, 0, 0 ],
+
+      "this is a comment  ": "int representing shape type: 0=ST_RECT, 1=ST_CIRCLE, 2=ST_EDGE",
+      "shape_type": 1,
+      "shape": [ 0, 0, 1],
+
+      "sprite": "images/brick_chunk_2.png",
+      "sprite_size": [ 45, 45 ],
       "sprite_fpl": 1,
 
       "frame_rate": 0,

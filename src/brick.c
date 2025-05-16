@@ -44,6 +44,9 @@ void brick_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 	if (collision_side.y <= 0) {
 		return;
 	}
+	particles_from_def("brick_chunk_1", 4, self->physics->position, gfc_vector2d(0, -1), gfc_vector2d(0, 0.2));
+	particles_from_def("brick_chunk_2", 3, self->physics->position, gfc_vector2d(0, -1), gfc_vector2d(0, 0.2));
+	slog("here");
 
 	entity_free(self);
 }
