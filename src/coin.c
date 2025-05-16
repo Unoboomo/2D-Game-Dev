@@ -44,12 +44,7 @@ void coin_touch(Entity* self, Entity* other, GFC_Vector2D collision_side) {
 	data = (PlayerEntityData*)other->data;
 
 	data->coin_count++;
-	if (data->coin_count >= MAX_COINS) {
-		data->coin_count -= MAX_COINS;
-		if (data->lives_count < MAX_LIVES) {
-			data->lives_count++;
-		}
-	}
+
 	particles_from_def("sparkle", 10, self->physics->position, gfc_vector2d(0, -1), gfc_vector2d(0, 0.1));
 	if (self->sound_effect) {
 		gfc_sound_play(self->sound_effect, 0, 1, -1, -1);

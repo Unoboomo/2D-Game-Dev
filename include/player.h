@@ -29,7 +29,6 @@
 #define LONG_JUMP_THRESHOLD 3.5
 #define LONG_JUMP_VELOCITY 6
 
-#define MAX_COINS 100
 #define MAX_LIVES 999
 
 
@@ -46,7 +45,7 @@ typedef struct PlayerEntityData_s
 
 	Uint8	crouching;				//is the player crouching?
 
-	Uint8	coin_count;
+	int		coin_count;
 	int		lives_count;
 }PlayerEntityData;
 /**

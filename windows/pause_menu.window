@@ -3,11 +3,11 @@
   "color": [ 128, 128, 128, 240 ],
   "widgets": [
     {
-      "name": "main_menu_button",
-      "bounds": [ 450, 200, 250, 40 ],
+      "name": "shop_button",
+      "bounds": [ 450, 200, 280, 40 ],
       "color": [ 0, 0, 0, 255 ],
-      "display_text": "Exit to main menu",
-      "pressed": "main"
+      "display_text": "Buy Additional Lives",
+      "pressed": "shop"
     },
     {
       "name": "exit_button",

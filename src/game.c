@@ -223,6 +223,9 @@ int main(int argc, char * argv[])
         if (gfc_input_command_pressed("next_world")) {
             world_switch_to_next();
         }
+        if (gfc_input_command_pressed("give_coins")) {
+            data->coin_count += 50;
+        }
     }
     Mix_FreeMusic(background_music);
     world_save(world_get_active(), "worlds/world_save1.world");

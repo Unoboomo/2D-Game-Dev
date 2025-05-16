@@ -5,6 +5,8 @@
 #include "gf2d_draw.h"
 #include "gf2d_graphics.h"
 
+#include "entity.h"
+#include "player.h"
 #include "font.h"
 
 #include "widgets.h"
@@ -16,7 +18,7 @@ extern int game_done;
 void widget_button_draw(Widget* widget, GFC_Vector2D offset);
 Uint8 widget_button_update(Widget* widget, GFC_Vector2D offset);
 void widget_start_game();
-void widget_quit_to_main_menu();
+void widget_shop();
 void widget_exit_application();
 
 Widget* widget_new()
@@ -125,8 +127,8 @@ Widget* widget_button_configure_from_json(SJson* json) {
         if (!strcmp(buffer, "exit")) {
             widget->pressed = widget_exit_application;
         }
-        else if (!strcmp(buffer, "main")) {
-            widget->pressed = widget_quit_to_main_menu;
+        else if (!strcmp(buffer, "shop")) {
+            widget->pressed = widget_shop;
         }
         else if (!strcmp(buffer, "start")) {
             widget->pressed = widget_start_game;
@@ -171,6 +173,21 @@ void widget_exit_application() {
 void widget_start_game() {
     slog("start");
 }
-void widget_quit_to_main_menu() {
-    slog("back to main");
+void widget_shop() {
+    Entity* player;
+    PlayerEntityData* data;
+
+    player = entity_get_player();
+    if (!player || !player->data) {
+        return;
+    }
+    data = (PlayerEntityData*)player->data;
+    if (data->coin_count >= 20) {
+        slog("here's an extra life");
+        data->lives_count++;
+        data->coin_count -= 20;
+    }
+    else {
+        slog("not enough coins to buy an extra life");
+    }
 }
