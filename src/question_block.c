@@ -24,6 +24,7 @@ Entity* question_block_new(GFC_Vector2D position) {
 
 	entity_set_collision_layer(self, ECL_ALL);
 	self->team = ETT_world;
+	self->sound_effect = gfc_sound_load("audio/brick.wav", 1, 2);
 
 	self->touch = question_block_touch;
 
@@ -99,6 +100,10 @@ void question_block_touch(Entity* self, Entity* other, GFC_Vector2D collision_si
 		return;
 	}
 	position = self->physics->position;
+	if (self->sound_effect) {
+		gfc_sound_play(self->sound_effect, 0, 1, -1, -1);
+		gfc_sound_free(self->sound_effect);
+	}
 	entity_free(self);
 	self = empty_question_block_new(position);
 	//quick getaround for clipping

@@ -36,7 +36,8 @@ Entity* player_new(GFC_Vector2D position) {
 	self->think = player_think;
 	self->update = player_update;
 	self->free = player_free;
-	
+	self->sound_effect = self->sound_effect = gfc_sound_load("audio/jump.wav", 1, 2);
+
 	entity_set_collision_layer(self, ECL_ALL);
 
 	data = gfc_allocate_array(sizeof(PlayerEntityData), 1);
@@ -58,6 +59,9 @@ void player_free(Entity* self) {
 		return;
 	}
 	data = self->data;
+	if (self->sound_effect) {
+		gfc_sound_free(self->sound_effect);
+	}
 	//other cleanup here
 	free(data);
 	self->data = NULL;
@@ -70,7 +74,7 @@ void player_think(Entity* self) {
 	float friction;
 	GFC_Vector2D jump_velocity = { 0 };
 	float x_velocity;
-
+	int jumped = 0;
 	if (!self|| !self->data) {
 		return;
 	}
@@ -197,10 +201,12 @@ void player_think(Entity* self) {
 	if (gfc_input_command_pressed("jump")) {
 		if (self->physics->grounded) { //normal jump
 			self->physics->velocity = jump_velocity;
+			jumped = 1;
 		}
 		else if (self->physics->x_world_collision || data->wall_jump_buffer > 0) { //wall jump
 			self->physics->velocity = gfc_vector2d(-data->last_x_collision_dir * WALL_JUMP_VELOCITY, JUMP_VELOCITY);
 			data->wall_jump_buffer = 0;
+			jumped = 1;
 		}
 		else { //buffer a jump
 			data->jump_buffer = JUMP_BUFFER;
@@ -209,23 +215,28 @@ void player_think(Entity* self) {
 	else if (self->physics->grounded && data->jump_buffer > 0) { //buffered jump
 			self->physics->velocity = jump_velocity;
 			data->jump_buffer = 0;
+			jumped = 1;
 	}
 	else if ((self->physics->x_world_collision || data->wall_jump_buffer > 0) && data->jump_buffer > 0) { //buffered wall jump
 		self->physics->velocity = gfc_vector2d(-data->last_x_collision_dir * WALL_JUMP_VELOCITY, JUMP_VELOCITY);
 		data->wall_jump_buffer = 0;
 		data->jump_buffer = 0;
+		jumped = 1;
 	}
 
 	if (data->ground_pound_recovery) {
 		if (self->physics->velocity.y < 0) { //we jumped out of the recovery
 			data->ground_pound_recovery = 0;
 			self->physics->velocity.y *= GROUND_POUND_RECOVERY_JUMP_BOOST; //groundpound jump boost
+			jumped = 1;
 		}
 		else if (self->physics->grounded) {
 			self->physics->acceleration.x = self->physics->velocity.x = 0;
 		}
 	}
-
+	if (self->sound_effect && jumped) {
+		gfc_sound_play(self->sound_effect, 0, 1, -1, -1);
+	}
 	self->physics->on_ice = 0;
 }
 

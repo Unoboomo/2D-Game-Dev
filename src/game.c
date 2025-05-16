@@ -1,6 +1,7 @@
 #include <SDL.h>
 #include "simple_logger.h"
 
+#include "gfc_audio.h"
 #include "gfc_input.h"
 #include "gfc_config_def.h"
 
@@ -47,7 +48,7 @@ int main(int argc, char * argv[])
     float mf = 0;
     Sprite *mouse;
     GFC_Color mouseGFC_Color = gfc_color8(216,2,0,255);
-    
+    Mix_Music* background_music;
     Window* pause_menu;
     Window* main_menu;
     Entity* player;
@@ -87,6 +88,7 @@ int main(int argc, char * argv[])
         gfc_vector4d(0,0,0,255),
         0);
     gfc_input_init("config/input.cfg");
+    gfc_audio_init(128, 2, 2, 2, 1, 1);
     gf2d_graphics_set_frame_delay(16);
     gf2d_sprite_init(1024);
     font_init();
@@ -123,11 +125,17 @@ int main(int argc, char * argv[])
     p_switch = p_switch_new(gfc_vector2d(1350, 900));
     one_way_wall = one_way_wall_new(gfc_vector2d(1400, 900));
 
+    background_music = gfc_sound_load_music("audio/00. The Tale of a Cruel World.wav");
+    gfc_sound_load("audio/Wilhelm.wav", 1, 2);
+
+
     data = (PlayerEntityData*)player->data;
     main_menu = window_new_from_file("windows/main_menu.window");
     pause_menu = window_new_from_file("windows/pause_menu.window");
     slog("press [escape] to quit");
-
+    if (background_music) {
+        Mix_PlayMusic(background_music, -1);
+    }
     /*main game loop*/
     while(!game_done)
     {
@@ -137,7 +145,9 @@ int main(int argc, char * argv[])
         /*update things here*/
         ms = SDL_GetMouseState(&mx,&my);
         mf+=0.1;
-        if (mf >= 16.0)mf = 0;
+        if (mf >= 16.0) {
+            mf = 0;
+        }
         
         //check window stuff
         if (gfc_input_command_pressed("toggle_window")) {
@@ -208,6 +218,7 @@ int main(int argc, char * argv[])
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
         last_ms = ms;
     }
+    Mix_FreeMusic(background_music);
     world_save(world, "worlds/world_save.world");
     entity_system_free_all();
     world_free(world);

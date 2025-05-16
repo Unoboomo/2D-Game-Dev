@@ -1,6 +1,7 @@
 #ifndef __ENTITY_H__
 #define __ENTITY_H__
 
+#include "gfc_audio.h"
 #include "gfc_text.h"
 #include "gfc_vector.h"
 #include "gfc_shape.h"
@@ -37,6 +38,7 @@ typedef struct Entity_s
 	EntityTeamType			team;								//which team this entity is on
 	EntityCollisionLayers	layer;								//bitmask for layers, only same layer can collide	
 
+	GFC_Sound*				sound_effect;
 	Sprite					*sprite;							//graphical representation of the entity
 	float					frame;								//for drawing the sprite
 
